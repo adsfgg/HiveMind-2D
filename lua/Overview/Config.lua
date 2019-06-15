@@ -12,6 +12,7 @@ function GetModConfig(kLogLevels)
 
 	config.modules =
 	{
+		'Overview'
 	}
 
 	return config
