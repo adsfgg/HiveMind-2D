@@ -37,7 +37,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print("COMMANDER ACTION " .. EnumToString(kTechId, techId))
+                Overview:PrintDebug("COMMANDER ACTION " .. EnumToString(kTechId, techId))
 
                 local newCommAction = {}
                 newCommAction.timeCompleted = self:GetGametime()
@@ -54,7 +54,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print("CONSTRUCTION COMPLETE ".. structure.kMapName)
+                Overview:PrintDebug("CONSTRUCTION COMPLETE ".. structure.kMapName)
 
                 local newConstruction = {}
                 newConstruction.timeCompleted = self:GetGametime()
@@ -70,7 +70,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print("Evolved: " .. EnumToString(kTechId, techId))
+                Overview:PrintDebug("Evolved: " .. EnumToString(kTechId, techId))
 
                 local newEvolved = {}
                 newEvolved.timeCompleted = self:GetGametime()
@@ -88,7 +88,7 @@ function StatsTracker:SetupTeamHandlers(team)
                     return
                 end
 
-                print("BOUGHT " .. EnumToString(kTechId, techId))
+                Overview:PrintDebug("BOUGHT " .. EnumToString(kTechId, techId))
 
                 local newBought = {}
                 newBought.timeCompleted = self:GetGametime()
@@ -123,7 +123,7 @@ function StatsTracker:Initialise()
     self.lastState = kGameState.NotStarted
     self.stats = {}
     self.tracking = false
-    self.debug = true
+    self.debug = false
 
     self:ResetStats()
     lastTime = Shared.GetTime()
@@ -201,10 +201,6 @@ function StatsTracker:SendMessage(msg)
 end
 
 function StatsTracker:OnCountdownStart()
-    if Shared.GetCheatsEnabled() and not self.debug then
-        Overview:PrintDebug("Not recording round with cheats enabled.")
-        return
-    end
     Overview:PrintDebug("Countdown started")
     self:ResetStats()
     self:SendMessage('Recording overview demo')
@@ -227,6 +223,9 @@ function StatsTracker:GetGametime()
 end
 
 function StatsTracker:OnGameEnd(gamestate)
+    if self.tracking == false then
+        return
+    end
     Overview:PrintDebug("Game ended")
     self.tracking = false
 
