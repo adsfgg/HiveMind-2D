@@ -77,7 +77,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 newEvolved.techId = techId
                 newEvolved.techName = EnumToString(kTechId, techId)
 
-                local evolvedStats = self.stats['evolved']["team" .. team:GetTeamNumber()]
+                local evolvedStats = self.stats['evolved']
 
                 table.insert(evolvedStats, newEvolved)
             end )
@@ -87,6 +87,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
+
                 print("BOUGHT " .. EnumToString(kTechId, techId))
 
                 local newBought = {}
@@ -94,14 +95,15 @@ function StatsTracker:SetupTeamHandlers(team)
                 newBought.techId = techId
                 newBought.techName = EnumToString(kTechId, techId)
 
-                local boughtStats = self.stats['evolved']["team" .. team:GetTeamNumber()]
+                local boughtStats = self.stats['bought']
 
                 table.insert(boughtStats, newBought)
             end )
 end
 
 function StatsTracker:InitTechStats()
-    local stats = {'research', 'commAction', 'construction', 'evolved', 'bought'}
+    local stats = {'research', 'commAction', 'construction'}
+    local teamStats = {'evolved', 'bought'}
     local team1 = "team" .. GetGamerules():GetTeam1():GetTeamNumber()
     local team2 = "team" .. GetGamerules():GetTeam2():GetTeamNumber()
 
@@ -109,6 +111,10 @@ function StatsTracker:InitTechStats()
         self.stats[v] = {}
         self.stats[v][team1] = {}
         self.stats[v][team2] = {}
+    end
+
+    for _,v in pairs(teamStats) do
+        self.stats[v] = {}
     end
 end
 
