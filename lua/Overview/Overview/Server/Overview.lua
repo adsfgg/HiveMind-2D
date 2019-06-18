@@ -1,7 +1,11 @@
+Script.Load("lua/Overview/Overview/lib/LibDeflate.lua")
+
 StatsTracker = {}
 StatsTracker.lastState = kGameState.NotStarted
 StatsTracker.stats = {}
 StatsTracker.tracking = false
+local LibDeflate = GetLibDeflateObject()
+
 local lastTime = 0
 local delay = Server.GetFrameRate() / 10
 
@@ -139,11 +143,14 @@ function StatsTracker:SaveStats()
     local dataFile = io.open("config://RoundStats.json", "w+")
 
     local jsonData = json.encode(self.stats, { indent=true })
+    local compressedJsonData = LibDeflate:CompressDeflate(json.encode(self.stats, { indent=false }))
 
     if dataFile then
         dataFile:write(jsonData)
         io.close(dataFile)
     end
+
+    print(compressedJsonData)
 end
 
 function StatsTracker:OnGameEnd(gamestate)
