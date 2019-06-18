@@ -1,9 +1,67 @@
 StatsTracker = {}
 StatsTracker.lastState = kGameState.NotStarted
 StatsTracker.stats = {}
+StatsTracker.tracking = false
+local lastTime = 0
+local delay = Server.GetFrameRate() / 10
+
+function StatsTracker:SetupTeamHandlers(team)
+    team:AddListener("OnResearchComplete",
+            function(structure, researchId)
+                if not self.tracking then
+                    return
+                end
+
+                local node = team:GetTechTree():GetTechNode(researchId)
+
+                if node:GetIsResearch() or node:GetIsUpgrade() then
+                    print("RESEARCH?!?!??!?!")
+                end
+
+            end )
+
+    team:AddListener("OnCommanderAction",
+            function(techId)
+                if not self.tracking then
+                    return
+                end
+                print("COMMANDER ACTION")
+            end )
+
+    team:AddListener("OnConstructionComplete",
+            function(structure)
+                if not self.tracking then
+                    return
+                end
+                print("CONSTRUCTION COMPLETE")
+            end )
+
+    team:AddListener("OnEvolved",
+            function(techId)
+                if not self.tracking then
+                    return
+                end
+                print(EnumToString(kTechId, techId))
+            end )
+
+    team:AddListener("OnBought",
+            function(techId)
+                if not self.tracking then
+                    return
+                end
+                print("BOUGHT")
+            end )
+end
 
 function StatsTracker:Initialise()
-    Overview:Print("Initialised")
+    Overview:PrintDebug("Initialised")
+    self:ResetStats()
+    lastTime = Shared.GetTime()
+end
+
+function StatsTracker:ResetStats()
+    self.stats = {}
+    self.tracking = false
 end
 
 function StatsTracker:CheckForRoundStart(currentState)
@@ -16,15 +74,7 @@ function StatsTracker:CheckForRoundStart(currentState)
     end
 end
 
-function StatsTracker:ResetStats()
-    self.stats = {}
-end
-
-function StatsTracker:OnGameStart()
-    Overview:PrintDebug("Game started")
-
-    -- init some player stats
-
+function StatsTracker:InitPlayerStats()
     local playerStats = {}
 
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
@@ -43,8 +93,18 @@ function StatsTracker:OnGameStart()
     end
 
     self.stats['players'] = playerStats
+end
 
-    -- init some round stats
+function StatsTracker:InitTechStats()
+    local techStats = {}
+
+    techStats['marine'] = {}
+    techStats['alien'] = {}
+
+    self.stats['tech'] = techStats
+end
+
+function StatsTracker:InitRoundStats()
     local roundStats = {}
 
     roundStats['start_time'] = os.date("%X")
@@ -52,6 +112,15 @@ function StatsTracker:OnGameStart()
     roundStats['map_name'] = Shared.GetMapName()
 
     self.stats['round'] = roundStats
+end
+
+function StatsTracker:OnGameStart()
+    Overview:PrintDebug("Game started")
+    self.tracking = true
+
+    self:InitPlayerStats()
+    self:InitRoundStats()
+    self:InitTechStats()
 end
 
 function StatsTracker:SendMessage(msg)
@@ -79,6 +148,7 @@ end
 
 function StatsTracker:OnGameEnd(gamestate)
     Overview:PrintDebug("Game ended")
+    self.tracking = false
 
     self.stats['round']['end_time'] = os.date("%X")
     self.stats['round']['end_date'] = os.date("%x")
@@ -103,34 +173,59 @@ function StatsTracker:OnGameEnd(gamestate)
 end
 
 function StatsTracker:CheckForChanges()
+    local playerStats = self.stats['players']
+    for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
 
+        if player.steamId ~= 0 then -- don't include b0ts
+
+            if playerStats[player.steamId] then
+
+                s = playerStats[player.steamId]
+
+                if player.teamNumber ~= s['teamNumber'] then
+                    s['teamNumber'] = player.teamNumber
+                end
+
+                if player.playerName ~= s['playerName'] then
+                    s['playerName'] = player.playerName
+                end
+
+                playerStats[player.steamId] = s
+            end
+
+        end
+    end
 end
 
 function StatsTracker:OnUpdate()
-    local currentState = GetGamerules():GetGameState()
-    local collectStats = true
+    if lastTime + delay < Shared.GetTime() then
+        lastTime = Shared.GetTime()
 
-    -- check game states
+        local currentState = GetGamerules():GetGameState()
+        local collectStats = true
 
-    -- check if the game is in countdown/starting
-    if self.lastState ~= kGameState.Started then
-        self:CheckForRoundStart(currentState)
-        collectStats = false
+        -- check game states
+
+        -- check if the game is in countdown/starting
+        if self.lastState ~= kGameState.Started then
+            self:CheckForRoundStart(currentState)
+            collectStats = false
+        end
+
+        -- check if the game is over
+        if currentState ~= self.lastState and (currentState == kGameState.Team1Won or currentState == kGameState.Team2Won or currentState == kGameState.Draw) then
+            self:OnGameEnd(currentState)
+            collectStats = false
+        end
+
+        if not collectStats then
+            StatsTracker.lastState = currentState
+            return
+        end
+
+        -- gather stats
+        self:CheckForChanges()
     end
-
-    -- check if the game is over
-    if currentState ~= self.lastState and (currentState == kGameState.Team1Won or currentState == kGameState.Team2Won or currentState == kGameState.Draw) then
-        self:OnGameEnd(currentState)
-        collectStats = false
-    end
-
-    if not collectStats then
-        StatsTracker.lastState = currentState
-        return
-    end
-
-    -- gather stats
-    self:CheckForChanges()
 end
 
 local function OnUpdateServer()
