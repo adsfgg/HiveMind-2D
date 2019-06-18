@@ -1,10 +1,8 @@
 Script.Load("lua/Overview/Overview/lib/LibDeflate.lua")
 
 StatsTracker = {}
-StatsTracker.lastState = kGameState.NotStarted
-StatsTracker.stats = {}
-StatsTracker.tracking = false
 local LibDeflate = GetLibDeflateObject()
+local bot = 0
 
 local lastTime = 0
 local delay = Server.GetFrameRate() / 10
@@ -19,7 +17,17 @@ function StatsTracker:SetupTeamHandlers(team)
                 local node = team:GetTechTree():GetTechNode(researchId)
 
                 if node:GetIsResearch() or node:GetIsUpgrade() then
-                    print("RESEARCH?!?!??!?!")
+                    Overview:PrintDebug("RESEARCH: On " .. structure.kMapName .. " tech: " .. EnumToString(kTechId, node:GetTechId()))
+
+                    local newResearch = {}
+                    newResearch.timeCompleted = self:GetGametime()
+                    newResearch.researchId = researchId
+                    newResearch.researchName = EnumToString(kTechId, node:GetTechId())
+                    newResearch.structure = structure.kMapName
+
+                    local researchStats = self.stats['research']["team" .. team:GetTeamNumber()]
+
+                    table.insert(researchStats, newResearch)
                 end
 
             end )
@@ -29,7 +37,16 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print("COMMANDER ACTION")
+                print("COMMANDER ACTION " .. EnumToString(kTechId, techId))
+
+                local newCommAction = {}
+                newCommAction.timeCompleted = self:GetGametime()
+                newCommAction.techId = researchId
+                newCommAction.techName = EnumToString(kTechId, techId)
+
+                local commActionStats = self.stats['commAction']["team" .. team:GetTeamNumber()]
+
+                table.insert(commActionStats, newCommAction)
             end )
 
     team:AddListener("OnConstructionComplete",
@@ -37,7 +54,15 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print("CONSTRUCTION COMPLETE")
+                print("CONSTRUCTION COMPLETE ".. structure.kMapName)
+
+                local newConstruction = {}
+                newConstruction.timeCompleted = self:GetGametime()
+                newConstruction.structure = structure.kMapName
+
+                local constructionStats = self.stats['construction']["team" .. team:GetTeamNumber()]
+
+                table.insert(constructionStats, newConstruction)
             end )
 
     team:AddListener("OnEvolved",
@@ -45,7 +70,16 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print(EnumToString(kTechId, techId))
+                print("Evolved: " .. EnumToString(kTechId, techId))
+
+                local newEvolved = {}
+                newEvolved.timeCompleted = self:GetGametime()
+                newEvolved.techId = techId
+                newEvolved.techName = EnumToString(kTechId, techId)
+
+                local evolvedStats = self.stats['evolved']["team" .. team:GetTeamNumber()]
+
+                table.insert(evolvedStats, newEvolved)
             end )
 
     team:AddListener("OnBought",
@@ -53,14 +87,42 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                print("BOUGHT")
+                print("BOUGHT " .. EnumToString(kTechId, techId))
+
+                local newBought = {}
+                newBought.timeCompleted = self:GetGametime()
+                newBought.techId = techId
+                newBought.techName = EnumToString(kTechId, techId)
+
+                local boughtStats = self.stats['evolved']["team" .. team:GetTeamNumber()]
+
+                table.insert(boughtStats, newBought)
             end )
 end
 
+function StatsTracker:InitTechStats()
+    local stats = {'research', 'commAction', 'construction', 'evolved', 'bought'}
+    local team1 = "team" .. GetGamerules():GetTeam1():GetTeamNumber()
+    local team2 = "team" .. GetGamerules():GetTeam2():GetTeamNumber()
+
+    for _,v in pairs(stats) do
+        self.stats[v] = {}
+        self.stats[v][team1] = {}
+        self.stats[v][team2] = {}
+    end
+end
+
 function StatsTracker:Initialise()
-    Overview:PrintDebug("Initialised")
+
+    self.lastState = kGameState.NotStarted
+    self.stats = {}
+    self.tracking = false
+    self.debug = true
+
     self:ResetStats()
     lastTime = Shared.GetTime()
+
+    Overview:PrintDebug("Initialised")
 end
 
 function StatsTracker:ResetStats()
@@ -83,29 +145,28 @@ function StatsTracker:InitPlayerStats()
 
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
 
-        if player.steamId ~= 0 then -- don't include b0ts
+        s = {}
+        s['joined_at'] = 0
+        s['left_at'] = -1
+        s['playerName'] = player.playerName
+        s['teamNumber'] = player.teamNumber
 
-            s = {}
-            s['joined_at'] = 0
-            s['left_at'] = -1
-            s['playerName'] = player.playerName
-            s['teamNumber'] = player.teamNumber
-
+        if player.steamId ~= 0 then
             playerStats[player.steamId] = s
-
+        else
+            playerStats["bot" .. bot] = s
+            bot = bot + 1
         end
     end
 
     self.stats['players'] = playerStats
-end
 
-function StatsTracker:InitTechStats()
-    local techStats = {}
+    local commanders = {}
 
-    techStats['marine'] = {}
-    techStats['alien'] = {}
+    commanders["team1"] = {}
+    commanders['team2'] = {}
 
-    self.stats['tech'] = techStats
+    self.stats['commanders'] = commanders
 end
 
 function StatsTracker:InitRoundStats()
@@ -134,6 +195,10 @@ function StatsTracker:SendMessage(msg)
 end
 
 function StatsTracker:OnCountdownStart()
+    if Shared.GetCheatsEnabled() and not self.debug then
+        Overview:PrintDebug("Not recording round with cheats enabled.")
+        return
+    end
     Overview:PrintDebug("Countdown started")
     self:ResetStats()
     self:SendMessage('Recording overview demo')
@@ -149,8 +214,10 @@ function StatsTracker:SaveStats()
         dataFile:write(jsonData)
         io.close(dataFile)
     end
+end
 
-    print(compressedJsonData)
+function StatsTracker:GetGametime()
+    return math.max( 0, math.floor(Shared.GetTime()) - GetGameInfoEntity():GetStartTime() )
 end
 
 function StatsTracker:OnGameEnd(gamestate)
@@ -159,7 +226,7 @@ function StatsTracker:OnGameEnd(gamestate)
 
     self.stats['round']['end_time'] = os.date("%X")
     self.stats['round']['end_date'] = os.date("%x")
-    self.stats['round']['round_length'] = math.max( 0, math.floor(Shared.GetTime()) - GetGameInfoEntity():GetStartTime() )
+    self.stats['round']['round_length'] = self:GetGametime()
     local winning_team
 
     if gamestate == kGameState.Team1Won then
