@@ -25,4 +25,4 @@ local function OnReceiveClientEntryCheck(client, message)
 end
 
 Event.Hook("ClientConnect", CheckServerEntry)
-Server.HookNetworkMessage(Mod.config.kModName .. "_EntryCheck", OnReceiveClientEntryCheck)
+Server.HookNetworkMessage(Mod:GetModName() .. "_EntryCheck", OnReceiveClientEntryCheck)

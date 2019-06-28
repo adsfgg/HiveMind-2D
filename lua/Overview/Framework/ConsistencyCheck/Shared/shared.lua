@@ -1,5 +1,5 @@
 local Mod = GetMod()
 
-Shared.RegisterNetworkMessage(Mod.config.kModName .. "_EntryCheck", {
+Shared.RegisterNetworkMessage(Mod:GetModName() .. "_EntryCheck", {
   count = "integer",
 })

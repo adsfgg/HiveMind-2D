@@ -8,7 +8,7 @@ local function CheckClientEntry()
 
 	Shared.GetMatchingFileNames("lua/entry/*", true, clientEntry)
 
-	Client.SendNetworkMessage(Mod.config.kModName .. "_EntryCheck", {count = #clientEntry}, true)
+	Client.SendNetworkMessage(Mod:GetModName() .. "_EntryCheck", {count = #clientEntry}, true)
 
 	sent = true
 end

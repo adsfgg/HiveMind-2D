@@ -1,5 +1,5 @@
 local Mod = GetMod()
-local texturesToReplace = Mod:GetGUITexturesToReplace()
+local texturesToReplace = Mod.ResourceSystem:GetGUITexturesToReplace()
 
 local old = GUIItem.SetTexture
 function GUIItem:SetTexture(tex)

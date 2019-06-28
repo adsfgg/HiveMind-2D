@@ -1,18 +1,19 @@
 local Mod = GetMod()
+local Tech = Mod.Tech
 
 local function TechDataChanges(techData)
-  local techToRemove = Mod:GetTechToRemove()
-  local techToChange = Mod:GetTechToChange()
+  local techToRemove = Tech:GetTechToRemove()
+  local techToChange = Tech:GetTechToChange()
 
   for techIndex = #techData, 1, -1 do
     local record = techData[techIndex]
     local techDataId = record[kTechDataId]
 
     if techToRemove[techDataId] then
-      Mod:PrintDebug("Removing tech: " .. record[kTechDataDisplayName], "all")
+      Mod.Logger:PrintDebug("Removing tech: " .. record[kTechDataDisplayName], "all")
       table.remove(techData, techIndex)
     elseif techToChange[techDataId] then
-      Mod:PrintDebug("Changing tech: " .. record[kTechDataDisplayName], "all")
+      Mod.Logger:PrintDebug("Changing tech: " .. record[kTechDataDisplayName], "all")
 
       for index, value in pairs(techToChange[techDataId]) do
         techData[techIndex][index] = value
@@ -27,9 +28,9 @@ function BuildTechData()
 
   TechDataChanges(techData)
 
-  local techToAdd = Mod:GetTechToAdd()
+  local techToAdd = Tech:GetTechToAdd()
   for _,v in ipairs(techToAdd) do
-    Mod:PrintDebug("Adding tech: " .. v[kTechDataDisplayName])
+    Mod.Logger:PrintDebug("Adding tech: " .. v[kTechDataDisplayName])
     table.insert(techData, v)
   end
 

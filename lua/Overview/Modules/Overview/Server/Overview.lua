@@ -1,7 +1,5 @@
-Script.Load("lua/Overview/Overview/lib/LibDeflate.lua")
-
 StatsTracker = {}
-local LibDeflate = GetLibDeflateObject()
+local LibDeflate = Overview.Libraries:GetLibraryObject("LibDeflate")
 local bot = 0
 
 local lastTime = 0
@@ -17,7 +15,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 local node = team:GetTechTree():GetTechNode(researchId)
 
                 if node:GetIsResearch() or node:GetIsUpgrade() then
-                    Overview:PrintDebug("RESEARCH: On " .. structure.kMapName .. " tech: " .. EnumToString(kTechId, node:GetTechId()))
+                    Overview.Logger:PrintDebug("RESEARCH: On " .. structure.kMapName .. " tech: " .. EnumToString(kTechId, node:GetTechId()))
 
                     local newResearch = {}
                     newResearch.timeCompleted = self:GetGametime()
@@ -37,7 +35,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                Overview:PrintDebug("COMMANDER ACTION " .. EnumToString(kTechId, techId))
+                Overview.Logger:PrintDebug("COMMANDER ACTION " .. EnumToString(kTechId, techId))
 
                 local newCommAction = {}
                 newCommAction.timeCompleted = self:GetGametime()
@@ -54,7 +52,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                Overview:PrintDebug("CONSTRUCTION COMPLETE ".. structure.kMapName)
+                Overview.Logger:PrintDebug("CONSTRUCTION COMPLETE ".. structure.kMapName)
 
                 local newConstruction = {}
                 newConstruction.timeCompleted = self:GetGametime()
@@ -70,7 +68,7 @@ function StatsTracker:SetupTeamHandlers(team)
                 if not self.tracking then
                     return
                 end
-                Overview:PrintDebug("Evolved: " .. EnumToString(kTechId, techId))
+                Overview.Logger:PrintDebug("Evolved: " .. EnumToString(kTechId, techId))
 
                 local newEvolved = {}
                 newEvolved.timeCompleted = self:GetGametime()
@@ -88,7 +86,7 @@ function StatsTracker:SetupTeamHandlers(team)
                     return
                 end
 
-                Overview:PrintDebug("BOUGHT " .. EnumToString(kTechId, techId))
+                Overview.Logger:PrintDebug("BOUGHT " .. EnumToString(kTechId, techId))
 
                 local newBought = {}
                 newBought.timeCompleted = self:GetGametime()
@@ -128,7 +126,7 @@ function StatsTracker:Initialise()
     self:ResetStats()
     lastTime = Shared.GetTime()
 
-    Overview:PrintDebug("Initialised")
+    Overview.Logger:PrintDebug("Initialised")
 end
 
 function StatsTracker:ResetStats()
@@ -186,7 +184,7 @@ function StatsTracker:InitRoundStats()
 end
 
 function StatsTracker:OnGameStart()
-    Overview:PrintDebug("Game started")
+    Overview.Logger:PrintDebug("Game started")
     self.tracking = true
 
     self:InitPlayerStats()
@@ -194,20 +192,15 @@ function StatsTracker:OnGameStart()
     self:InitTechStats()
 end
 
-function StatsTracker:SendMessage(msg)
-    Server.SendNetworkMessage("Chat", BuildChatMessage(false, "Overview", -1, kTeamReadyRoom, kNeutralTeamType, msg), true)
-    Shared.Message("Chat All - Overview: " .. msg)
-    Server.AddChatToHistory(msg, "Overview", 0, kTeamReadyRoom, false)
-end
-
 function StatsTracker:OnCountdownStart()
-    Overview:PrintDebug("Countdown started")
+    Overview.Logger:PrintDebug("Countdown started")
     self:ResetStats()
-    self:SendMessage('Recording overview demo')
+    Overview.Logger:SendChatMessage('Recording overview demo')
 end
 
 function StatsTracker:SaveStats()
     local dataFile = io.open("config://RoundStats.json", "w+")
+    local compressedDataFile = io.open("config://RoundStatsCompressed.txt", "w+")
 
     local jsonData = json.encode(self.stats, { indent=true })
     local compressedJsonData = LibDeflate:CompressDeflate(json.encode(self.stats, { indent=false }))
@@ -215,6 +208,11 @@ function StatsTracker:SaveStats()
     if dataFile then
         dataFile:write(jsonData)
         io.close(dataFile)
+    end
+
+    if compressedDataFile then
+        compressedDataFile:write(compressedJsonData)
+        io.close(compressedDataFile)
     end
 end
 
@@ -226,7 +224,7 @@ function StatsTracker:OnGameEnd(gamestate)
     if self.tracking == false then
         return
     end
-    Overview:PrintDebug("Game ended")
+    Overview.Logger:PrintDebug("Game ended")
     self.tracking = false
 
     self.stats['round']['end_time'] = os.date("%X")
@@ -248,7 +246,7 @@ function StatsTracker:OnGameEnd(gamestate)
 
     self:SaveStats()
 
-    self:SendMessage('Demo saved.')
+    Overview.Logger:SendChatMessage('Demo saved.')
 end
 
 function StatsTracker:CheckForChanges()

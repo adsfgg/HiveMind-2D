@@ -2,18 +2,23 @@ function GetModConfig(kLogLevels)
 	local config = {}
 
 	config.kLogLevel = kLogLevels.debug
-	config.kShowInFeedbackText = false
-	config.kModVersion = "0"
-	config.kModBuild = "1"
+	config.kShowInFeedbackText = true
 	config.disableRanking = false
 	config.use_config = "none"
 	config.techIdsToAdd = {
 	}
 
-	config.modules =
-	{
-		'Overview'
+	config.libraries = {
+		"LibDeflate"
+	}
+
+	config.modules = {
+		"Overview"
 	}
 
 	return config
+end
+
+function GetVersionInformation(Versioning)
+	Versioning:SetVersion(0, 1, 3, "alpha")
 end

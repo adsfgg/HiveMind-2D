@@ -1,17 +1,19 @@
-local Mod = GetMod()
+if not string.find(Script.CallStack(), "Main.lua") then
+	local Mod = GetMod()
 
-Mod:PrintDebug("Loading Predict files", "Predict")
+	Mod.Logger:PrintDebug("Loading Predict files", "Predict")
 
-for i = 1, #Mod.config.modules do
-	local path = Mod:FormatDir(Mod.config.modules[i], "Predict")
+	for i = 1, #Mod:GetModules() do
+		local path = Mod:FormatDir(Mod:GetModules()[i], "Predict")
 
-	local PredictFiles = {}
-	Shared.GetMatchingFileNames(path, true, PredictFiles)
+		local PredictFiles = {}
+		Shared.GetMatchingFileNames(path, true, PredictFiles)
 
-	for i = 1, #PredictFiles do
-		Mod:PrintDebug("Loading predict file: " .. PredictFiles[i], "Predict")
-		Script.Load(PredictFiles[i])
+		for j = 1, #PredictFiles do
+			Mod.Logger:PrintDebug("Loading predict file: " .. PredictFiles[j], "Predict")
+			Script.Load(PredictFiles[j])
+		end
 	end
-end
 
-Mod:PrintDebug("Predict files loaded.", "Predict")
+	Mod.Logger:PrintDebug("Predict files loaded.", "Predict")
+end
