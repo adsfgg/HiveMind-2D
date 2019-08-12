@@ -3509,6 +3509,6 @@ end
 -- we need to modify the library here because ns2's script.load doesnt return the values from the require call for some
 -- reason. so lets just make a global getter for the object :\
 
-function GetLibraryObject()
+function GetLibDeflate()
     return LibDeflate
 end
