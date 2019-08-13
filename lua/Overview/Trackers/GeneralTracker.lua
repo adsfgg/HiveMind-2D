@@ -16,9 +16,7 @@ end
 function GeneralTracker:OnUpdate()
     local gameTime = GetGametime()
 
-    if self:ShouldUpdate("gameTime", gameTime) then
-        self:UpdateValue("gameTime", gameTime)
-    end
+    self:TryUpdateValue("gameTime", gameTime)
 
     Tracker.OnUpdate(self)
 end

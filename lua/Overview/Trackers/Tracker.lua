@@ -26,6 +26,12 @@ function Tracker:ShouldUpdate(key, value)
     return true
 end
 
+function Tracker:TryUpdateValue(key, value)
+    if self:ShouldUpdate(key, value) then
+        self:UpdateValue(key, value)
+    end
+end
+
 function Tracker:UpdateValue(key, value)
     assert(key)
     assert(value)
