@@ -88,7 +88,7 @@ end
 
 function Overview:FinalizeHeaders()
 
-    local winning_team = -2
+    local winning_team = -1
     local currentState = GetGamerules():GetGameState()
 
     if currentState == kGameState.Team1Won then
@@ -96,10 +96,8 @@ function Overview:FinalizeHeaders()
     elseif currentState == kGameState.Team2Won then
         winning_team = kTeam2Index
     elseif currentState == kGameState.Draw then
-        winning_team = -1
+        winning_team = 0
     end
-
-    print("winning_team: " .. winning_team)
 
     header['winning_team'] = winning_team
     header['round_length'] = self:GetGametime()
