@@ -6,7 +6,7 @@ class 'GameStateMonitor'
 
 local lastState
 
-function GameStart:CheckGameState()
+function GameStateMonitor:CheckGameState()
     local currentState = GetGamerules():GetGameState()
     if not lastState then
         lastState = currentState
@@ -29,7 +29,7 @@ function GameStart:CheckGameState()
     return collectStats
 end
 
-function GameStart:CheckForGameStart(currentState)
+function GameStateMonitor:CheckForGameStart(currentState)
     if lastState ~= currentState then
         if currentState == kGameState.Countdown then
             self:OnCountdownStart()
@@ -39,7 +39,7 @@ function GameStart:CheckForGameStart(currentState)
     end
 end
 
-function GameStart:CheckForGameEnd(currentState)
+function GameStateMonitor:CheckForGameEnd(currentState)
     if lastState ~= currentState then
         if currentState == kGameState.Team1Won or currentState == kGameState.Team2Won or currentState == kGameState.Draw then
             self:OnGameEnd()
@@ -49,17 +49,17 @@ function GameStart:CheckForGameEnd(currentState)
     return false
 end
 
-function GameStart:OnCountdownStart()
+function GameStateMonitor:OnCountdownStart()
     print("Overview: Countdown started.")
     Overview:OnCountdownStart()
 end
 
-function GameStart:OnGameStart()
+function GameStateMonitor:OnGameStart()
     print("Overview: Game started")
     Overview:OnGameStart()
 end
 
-function GameStart:OnGameEnd()
+function GameStateMonitor:OnGameEnd()
     print("Overview: Game ended.")
     Overview:OnGameEnd()
 end

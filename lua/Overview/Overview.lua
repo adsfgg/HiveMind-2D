@@ -10,6 +10,8 @@ local gameStateMonitor
 local lastTime = 0
 local delay = Server.GetFrameRate() / 10
 
+local trackers = {}
+
 local function UpdateTrackers()
     print("Updating trackers...")
 end
@@ -33,13 +35,19 @@ end
 class 'Overview'
 
 function Overview:Initialize()
-    gameStateMonitor = GameStart()
+    gameStateMonitor = GameStateMonitor()
 
     Event.Hook("UpdateServer", OnUpdateServer)
 end
 
+function Overview:Reset()
+    -- TODO: Reset trackers
+end
+
 function Overview:OnCountdownStart()
     SendChatMessage("Recording overview demo")
+    self:Reset()
+    lastTime = Shared.GetTime()
 end
 
 function Overview:OnGameStart()
