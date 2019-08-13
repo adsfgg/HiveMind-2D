@@ -23,8 +23,8 @@ end
 function PlayerTracker:OnUpdate()
     -- iterate through all players
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
-        player = Shared.GetEntity(player.playerId)
         local id = player:GetId()
+        player = Shared.GetEntity(player.playerId)
         local playerName = player:GetName()
         local pres = player:GetPersonalResources()
         local health = player:GetHealth()
