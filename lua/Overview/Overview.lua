@@ -61,6 +61,10 @@ function Overview:Initialize()
     Event.Hook("UpdateServer", OnUpdateServer)
 end
 
+function Overview:GetGametime()
+    return math.max( 0, math.floor(Shared.GetTime()) - GetGameInfoEntity():GetStartTime() )
+end
+
 function Overview:Reset()
     for _,tracker in ipairs(trackers) do
         tracker:OnReset()
@@ -82,6 +86,27 @@ function Overview:InitHeader()
     header['end_date'] = -1
 end
 
+function Overview:FinalizeHeaders()
+
+    local winning_team = -2
+    local currentState = GetGamerules():GetGameState()
+
+    if currentState == kGameState.Team1Won then
+        winning_team = kTeam1Index
+    elseif currentState == kGameState.Team2Won then
+        winning_team = kTeam2Index
+    elseif currentState == kGameState.Draw then
+        winning_team = -1
+    end
+
+    print("winning_team: " .. winning_team)
+
+    header['winning_team'] = winning_team
+    header['round_length'] = self:GetGametime()
+    header['end_time'] = os.date("%X")
+    header['end_date'] = os.date("%x")
+end
+
 function Overview:OnCountdownStart()
     self:Reset()
     lastTime = Shared.GetTime()
@@ -93,6 +118,8 @@ function Overview:OnGameStart()
 end
 
 function Overview:OnGameEnd()
+    self:FinalizeHeaders()
+
     -- initialize the json structure
     jsonStructure = {}
     jsonStructure['header'] = header
@@ -102,5 +129,5 @@ function Overview:OnGameEnd()
     SaveAndSendRoundData(jsonStructure)
 
     -- notify the players that the demo was saved successfully.
-    SendChatMessage("Demo saved. Round Id: " .. jsonStructure['header']['round_id'])
+    SendChatMessage("Demo recorded. Round Id: " .. jsonStructure['header']['round_id'])
 end

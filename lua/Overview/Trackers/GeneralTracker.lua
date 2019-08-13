@@ -9,16 +9,12 @@ Script.Load("lua/Overview/Trackers/Tracker.lua")
 
 class 'GeneralTracker' (Tracker)
 
-local function GetGametime()
-    return math.max( 0, math.floor(Shared.GetTime()) - GetGameInfoEntity():GetStartTime() )
-end
-
 function GeneralTracker:GetName()
     return "general"
 end
 
 function GeneralTracker:OnUpdate()
-    local gameTime = GetGametime()
+    local gameTime = Overview:GetGametime()
 
     self:TryUpdateValue("gameTime", gameTime)
 
