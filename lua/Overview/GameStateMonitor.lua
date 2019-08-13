@@ -13,20 +13,16 @@ function GameStateMonitor:CheckGameState()
         return
     end
 
-    local collectStats = true
-
     if lastState ~= kGameState.Started then
         self:CheckForGameStart(currentState)
         collectStats = false
     end
 
-    if self:CheckForGameEnd(currentState) then
-        collectStats = false
-    end
+    self:CheckForGameEnd(currentState)
 
     lastState = currentState
 
-    return collectStats
+    return currentState == kGameState.Started
 end
 
 function GameStateMonitor:CheckForGameStart(currentState)

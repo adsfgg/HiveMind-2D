@@ -13,10 +13,14 @@ local function GetGametime()
     return math.max( 0, math.floor(Shared.GetTime()) - GetGameInfoEntity():GetStartTime() )
 end
 
+function GeneralTracker:GetName()
+    return "general"
+end
+
 function GeneralTracker:OnUpdate()
     local gameTime = GetGametime()
 
     self:TryUpdateValue("gameTime", gameTime)
 
-    Tracker.OnUpdate(self)
+    return Tracker.OnUpdate(self)
 end

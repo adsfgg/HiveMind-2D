@@ -12,12 +12,26 @@ Tracker.nextUpdate = {}
 function Tracker:OnUpdate()
     self.lastUpdate = self.nextUpdate
     self.nextUpdate = {}
+
+    return self.lastUpdate
+end
+
+function Tracker:OnReset()
+    self.lastUpdate = {}
+    self.nextUpdate = {}
+end
+
+function Tracker:GetName()
+    assert(false)
 end
 
 function Tracker:ShouldUpdate(key, value)
     assert(key)
     assert(value)
-    assert(self.lastUpdate[key])
+
+    --if not self.lastUpdate[key] then
+    --    return true
+    --end
 
     if self.lastUpdate[key] == value then
         return false
