@@ -1,12 +1,12 @@
 if not Server then return end
 
 Script.Load("lua/Overview/Trackers/GeneralTracker.lua")
-Script.Load("lua/Overview/GameStart.lua")
+Script.Load("lua/Overview/GameStateMonitor.lua")
 Script.Load("lua/Overview/LibDeflate.lua")
 
 local LibDeflate = GetLibDeflate()
 
-local gameStart
+local gameStateMonitor
 local lastTime = 0
 local delay = Server.GetFrameRate() / 10
 
@@ -18,7 +18,7 @@ local function OnUpdateServer()
     if lastTime + delay < Shared.GetTime() then
         lastTime = Shared.GetTime()
 
-        if gameStart:CheckGameState() then
+        if gameStateMonitor:CheckGameState() then
             UpdateTrackers()
         end
     end
@@ -33,7 +33,7 @@ end
 class 'Overview'
 
 function Overview:Initialize()
-    gameStart = GameStart()
+    gameStateMonitor = GameStart()
 
     Event.Hook("UpdateServer", OnUpdateServer)
 end

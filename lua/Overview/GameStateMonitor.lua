@@ -2,7 +2,7 @@
     Class to monitor the GameState.
 ]]
 
-class 'GameStart'
+class 'GameStateMonitor'
 
 local lastState
 
