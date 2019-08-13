@@ -49,21 +49,18 @@ end
 
 function Tracker:ShouldUpdate(key, value, subarray)
     assert(key)
-    assert(value)
+    assert(value ~= nil)
 
     if subarray then
         if not self.fullInfo[subarray] then
-            print("updating because we're using a subarray that didnt exist last frame")
             return true
         end
 
         if self.fullInfo[subarray][key] == value then
-            print("not updating because the value was the same as last frame. [" .. subarray .. "][" .. key .. "] == " .. value)
             return false
         end
     else
         if self.fullInfo[key] == value then
-            print("not updating because the value was the same as last frame. [" .. key .. "] == " .. value)
             return false
         end
     end
@@ -79,7 +76,7 @@ end
 
 function Tracker:UpdateValue(key, value, subarray)
     assert(key)
-    assert(value)
+    assert(value ~= nil)
 
     if subarray then
         if not self.changes[subarray] then
