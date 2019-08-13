@@ -15,7 +15,6 @@ function GameStateMonitor:CheckGameState()
 
     if lastState ~= kGameState.Started then
         self:CheckForGameStart(currentState)
-        collectStats = false
     end
 
     self:CheckForGameEnd(currentState)

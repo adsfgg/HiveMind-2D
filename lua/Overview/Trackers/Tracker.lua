@@ -5,20 +5,42 @@
 -- Abstract
 class 'Tracker'
 
-Tracker.lastUpdate = {}
-Tracker.nextUpdate = {}
+Tracker.fullInfo = {}
+Tracker.changes = {}
+
+--https://stackoverflow.com/a/1283608
+local function tableMerge(t1, t2)
+    for k,v in pairs(t2) do
+        if type(v) == "table" then
+            if type(t1[k] or false) == "table" then
+                tableMerge(t1[k] or {}, t2[k] or {})
+            else
+                t1[k] = v
+            end
+        else
+            t1[k] = v
+        end
+    end
+    return t1
+end
 
 -- Here we gather info for the tracker
 function Tracker:OnUpdate()
-    self.lastUpdate = self.nextUpdate
-    self.nextUpdate = {}
+    if next(self.changes) == nil then
+        return nil
+    end
 
-    return self.lastUpdate
+    self.fullInfo = tableMerge(self.fullInfo, self.changes)
+
+    local changes = self.changes
+    self.changes = {}
+
+    return changes
 end
 
 function Tracker:OnReset()
-    self.lastUpdate = {}
-    self.nextUpdate = {}
+    self.fullInfo = {}
+    self.changes = {}
 end
 
 function Tracker:GetName()
@@ -30,17 +52,17 @@ function Tracker:ShouldUpdate(key, value, subarray)
     assert(value)
 
     if subarray then
-        if not self.lastUpdate[subarray] then
+        if not self.fullInfo[subarray] then
             print("updating because we're using a subarray that didnt exist last frame")
             return true
         end
 
-        if self.lastUpdate[subarray][key] == value then
+        if self.fullInfo[subarray][key] == value then
             print("not updating because the value was the same as last frame. [" .. subarray .. "][" .. key .. "] == " .. value)
             return false
         end
     else
-        if self.lastUpdate[key] == value then
+        if self.fullInfo[key] == value then
             print("not updating because the value was the same as last frame. [" .. key .. "] == " .. value)
             return false
         end
@@ -60,32 +82,24 @@ function Tracker:UpdateValue(key, value, subarray)
     assert(value)
 
     if subarray then
-        if not self.nextUpdate[subarray] then
-            self.nextUpdate[subarray] = {}
+        if not self.changes[subarray] then
+            self.changes[subarray] = {}
         end
 
-        self.nextUpdate[subarray][key] = value
+        self.changes[subarray][key] = value
     else
-        self.nextUpdate[key] = value
+        self.changes[key] = value
     end
 end
 
 function Tracker:DeleteValue(key)
-    self.nextUpdate[key] = nil
+    self.changes[key] = nil
 end
 
-function Tracker:AddValue(key, value)
-    assert(key)
-    assert(value)
-
-    assert(not self.nextUpdate[key])
-    self:UpdateValue(key, value)
+function Tracker:GetChanges()
+    return self.changes
 end
 
-function Tracker:GetLastUpdate()
-    return self.lastUpdate
-end
-
-function Tracker:GetNextUpdate()
-    return self.nextUpdate
+function Tracker:GetFullInfo()
+    return self.fullInfo
 end

@@ -1,23 +1,24 @@
 Script.Load("lua/Overview/LibDeflate.lua")
 
 local LibDeflate = GetLibDeflate()
+local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/recieveRoundStats"
 
 local function SendData(compressedJsonData)
-    print("we're sending data for sure :)))")
+    Shared.SendHTTPRequest( ns2OverviewStatsURL, "POST", { data = compressedJsonData }, function(response)
+        local data, pos, err = json.decode(response)
+
+        if err then
+            Shared.Message("Could not parse NS2 overview response. Error: " .. ToString(err) .. ". Response: " .. response)
+        end
+    end)
 end
 
-local function SaveData(jsonData, compressedJsonData)
+local function SaveData(jsonData)
     local dataFile = io.open("config://RoundStats.json", "w+")
-    local compressedDataFile = io.open("config://RoundStatsCompressed.txt", "w+")
 
     if dataFile then
         dataFile:write(jsonData)
         io.close(dataFile)
-    end
-
-    if compressedDataFile then
-        compressedDataFile:write(compressedJsonData)
-        io.close(compressedDataFile)
     end
 end
 

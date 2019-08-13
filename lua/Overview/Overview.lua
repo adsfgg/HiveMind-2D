@@ -6,7 +6,7 @@ Script.Load("lua/Overview/GameStateMonitor.lua")
 Script.Load("lua/Overview/SaveSend.lua")
 Script.Load("lua/Overview/uuid.lua")
 
-local updatesPerSecond = 2 -- trackers update twice every second.
+local updatesPerSecond = 10
 
 local uuid = GetUUIDLibrary()
 
@@ -24,10 +24,14 @@ local function UpdateTrackers()
 
     for _,tracker in ipairs(trackers) do
         local data = tracker:OnUpdate()
-        trackerData[tracker:GetName()] = data
+        if data then
+            trackerData[tracker:GetName()] = data
+        end
     end
 
-    table.insert(update_data, trackerData)
+    if next(trackerData) ~= nil then
+        table.insert(update_data, trackerData)
+    end
 end
 
 local function OnUpdateServer()
