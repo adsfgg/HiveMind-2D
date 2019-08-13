@@ -5,11 +5,13 @@ Script.Load("lua/Overview/GameStateMonitor.lua")
 Script.Load("lua/Overview/SaveSend.lua")
 Script.Load("lua/Overview/uuid.lua")
 
+local updatesPerSecond = 2 -- trackers update twice every second.
+
 local uuid = GetUUIDLibrary()
 
 local gameStateMonitor
 local lastTime = 0
-local delay = Server.GetFrameRate() / 10
+local delay
 
 local trackers = {}
 
@@ -53,11 +55,10 @@ function Overview:Initialize()
     -- trackers
     generalTracker = GeneralTracker()
 
-
     -- insert trackers
     table.insert(trackers, generalTracker)
 
-
+    delay = 1 / updatesPerSecond
     Event.Hook("UpdateServer", OnUpdateServer)
 end
 
@@ -107,12 +108,11 @@ end
 
 function Overview:OnCountdownStart()
     self:Reset()
-    lastTime = Shared.GetTime()
     SendChatMessage("Recording overview demo")
 end
 
 function Overview:OnGameStart()
-
+    lastTime = 0 -- force an update.
 end
 
 function Overview:OnGameEnd()
