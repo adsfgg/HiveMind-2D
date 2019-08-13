@@ -1,6 +1,7 @@
 if not Server then return end
 
 Script.Load("lua/Overview/Trackers/GeneralTracker.lua")
+Script.Load("lua/Overview/Trackers/PlayerTracker.lua")
 Script.Load("lua/Overview/GameStateMonitor.lua")
 Script.Load("lua/Overview/SaveSend.lua")
 Script.Load("lua/Overview/uuid.lua")
@@ -19,7 +20,6 @@ local header = {}
 local update_data = {}
 
 local function UpdateTrackers()
-    print("Updating trackers...")
     local trackerData = {}
 
     for _,tracker in ipairs(trackers) do
@@ -48,15 +48,21 @@ end
 
 class 'Overview'
 
+function Overview:InitTrackers()
+    -- trackers
+    generalTracker = GeneralTracker()
+    playerTracker = PlayerTracker()
+
+    -- insert trackers
+    table.insert(trackers, generalTracker)
+    table.insert(trackers, playerTracker)
+end
+
 function Overview:Initialize()
     uuid.seed()
     gameStateMonitor = GameStateMonitor()
 
-    -- trackers
-    generalTracker = GeneralTracker()
-
-    -- insert trackers
-    table.insert(trackers, generalTracker)
+    self:InitTrackers()
 
     delay = 1 / updatesPerSecond
     Event.Hook("UpdateServer", OnUpdateServer)

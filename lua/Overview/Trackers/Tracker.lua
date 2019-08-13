@@ -25,32 +25,49 @@ function Tracker:GetName()
     assert(false)
 end
 
-function Tracker:ShouldUpdate(key, value)
+function Tracker:ShouldUpdate(key, value, subarray)
     assert(key)
     assert(value)
 
-    --if not self.lastUpdate[key] then
-    --    return true
-    --end
+    if subarray then
+        if not self.lastUpdate[subarray] then
+            print("updating because we're using a subarray that didnt exist last frame")
+            return true
+        end
 
-    if self.lastUpdate[key] == value then
-        return false
+        if self.lastUpdate[subarray][key] == value then
+            print("not updating because the value was the same as last frame. [" .. subarray .. "][" .. key .. "] == " .. value)
+            return false
+        end
+    else
+        if self.lastUpdate[key] == value then
+            print("not updating because the value was the same as last frame. [" .. key .. "] == " .. value)
+            return false
+        end
     end
 
     return true
 end
 
-function Tracker:TryUpdateValue(key, value)
-    if self:ShouldUpdate(key, value) then
-        self:UpdateValue(key, value)
+function Tracker:TryUpdateValue(key, value, subarray)
+    if self:ShouldUpdate(key, value, subarray) then
+        self:UpdateValue(key, value, subarray)
     end
 end
 
-function Tracker:UpdateValue(key, value)
+function Tracker:UpdateValue(key, value, subarray)
     assert(key)
     assert(value)
 
-    self.nextUpdate[key] = value
+    if subarray then
+        if not self.nextUpdate[subarray] then
+            self.nextUpdate[subarray] = {}
+        end
+
+        self.nextUpdate[subarray][key] = value
+    else
+        self.nextUpdate[key] = value
+    end
 end
 
 function Tracker:DeleteValue(key)
