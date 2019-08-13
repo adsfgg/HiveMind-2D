@@ -1,3 +1,7 @@
+--[[
+    Class to monitor the GameState.
+]]
+
 class 'GameStart'
 
 local lastState
