@@ -19,32 +19,6 @@ function PlayerTracker:GetName()
     return "player"
 end
 
-local techUpgradesTable =
-{
-    kTechId.Jetpack,
-    kTechId.Welder,
-    kTechId.ClusterGrenade,
-    kTechId.PulseGrenade,
-    kTechId.GasGrenade,
-    kTechId.Mine,
-
-    kTechId.Vampirism,
-    kTechId.Carapace,
-    kTechId.Regeneration,
-
-    kTechId.Aura,
-    kTechId.Focus,
-    kTechId.Camouflage,
-
-    kTechId.Celerity,
-    kTechId.Adrenaline,
-    kTechId.Crush,
-
-    kTechId.Parasite
-}
-
-local techUpgradesBitmask = CreateBitMask(techUpgradesTable)
-
 -- TODO: Add position and accuracy
 function PlayerTracker:OnUpdate()
     -- iterate through all players
@@ -66,9 +40,3 @@ function PlayerTracker:OnUpdate()
 
     return Tracker.OnUpdate(self)
 end
-
---[[
-
-players[general[pres, team, etc], [specific] ]
-
-]]
