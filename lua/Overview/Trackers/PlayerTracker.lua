@@ -25,21 +25,34 @@ function PlayerTracker:OnUpdate()
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
         local id = player:GetId()
         player = Shared.GetEntity(player.playerId)
-        local playerName = player:GetName()
-        local pres = player:GetPersonalResources()
-        local health = player:GetHealth()
-        local armour = player:GetArmor()
         local team = player:GetTeamNumber()
-        local alive = player:GetIsAlive()
-        local commander = player:isa("Commander")
 
-        self:TryUpdateValue("player_name", playerName, id)
-        self:TryUpdateValue("pres", pres, id)
-        self:TryUpdateValue("health", health, id)
-        self:TryUpdateValue("armour", armour, id)
-        self:TryUpdateValue("team", team, id)
-        self:TryUpdateValue("alive", alive, id)
-        self:TryUpdateValue("commander", commander, id)
+        if team ~= kTeamReadyRoom then
+            local playerName = player:GetName()
+            local pres = player:GetPersonalResources()
+            local health = player:GetHealth()
+            local armour = player:GetArmor()
+            local alive = player:GetIsAlive()
+            local commander = player:isa("Commander")
+            local current_weapon = false
+            local weapon = player:GetActiveWeapon()
+
+            if weapon and weapon.GetMapName then
+                current_weapon = weapon:GetMapName()
+            end
+
+            local spectator = player:GetIsSpectator()
+
+            self:TryUpdateValue("player_name", playerName, id)
+            self:TryUpdateValue("pres", pres, id)
+            self:TryUpdateValue("health", health, id)
+            self:TryUpdateValue("armour", armour, id)
+            self:TryUpdateValue("team", team, id)
+            self:TryUpdateValue("alive", alive, id)
+            self:TryUpdateValue("commander", commander, id)
+            self:TryUpdateValue("spectator", spectator, id)
+            self:TryUpdateValue("current_weapon", current_weapon, id)
+        end
     end
 
     return Tracker.OnUpdate(self)

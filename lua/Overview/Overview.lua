@@ -35,6 +35,7 @@ local function UpdateTrackers()
     end
 
     if next(trackerData) ~= nil then
+        --update_data[tostring(updates)] = trackerData
         table.insert(update_data, trackerData)
     end
 
@@ -85,9 +86,16 @@ function Overview:GetGametime()
 end
 
 function Overview:Reset()
+    lastTime = 0
+    header = {}
+    update_data = {}
+    total_update_time = 0
+    updates = 0
+
     for _,tracker in ipairs(trackers) do
         tracker:OnReset()
     end
+
     self:InitHeader()
 end
 
@@ -164,7 +172,7 @@ function Overview:OnCountdownStart()
 end
 
 function Overview:OnGameStart()
-    lastTime = 0 -- force an update.
+    lastTime = Shared.GetTime() -- force a delayed update.
 end
 
 function Overview:OnGameEnd()
