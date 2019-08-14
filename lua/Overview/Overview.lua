@@ -20,7 +20,11 @@ local trackers = {}
 local header = {}
 local update_data = {}
 
+local total_update_time = 0
+local updates = 0
+
 local function UpdateTrackers()
+    local start_time = Shared.GetTime()
     local trackerData = {}
 
     for _,tracker in ipairs(trackers) do
@@ -33,6 +37,13 @@ local function UpdateTrackers()
     if next(trackerData) ~= nil then
         table.insert(update_data, trackerData)
     end
+
+    local end_time = Shared.GetTime()
+    local time_taken = end_time - start_time
+
+    total_update_time = total_update_time + math.max(0, time_taken)
+
+    updates = updates + 1
 end
 
 local function OnUpdateServer()
@@ -92,6 +103,7 @@ function Overview:InitHeader()
     header['round_length'] = -1
     header['end_time'] = -1
     header['end_date'] = -1
+    header['average_update_time'] = -1
 end
 
 function Overview:FinalizeHeaders()
@@ -111,6 +123,14 @@ function Overview:FinalizeHeaders()
     header['round_length'] = self:GetGametime()
     header['end_time'] = os.date("%X")
     header['end_date'] = os.date("%x")
+    header['update_resolution'] = updatesPerSecond
+    header['updates'] = updates
+    header['total_update_time'] = total_update_time
+    if updates > 0 then
+        header['average_update_time'] = total_update_time / updates
+    else
+        header['average_update_time'] = 0
+    end
 end
 
 function Overview:OnCountdownStart()
