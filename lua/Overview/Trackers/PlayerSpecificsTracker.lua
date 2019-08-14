@@ -3,7 +3,6 @@
 
     Currently tracking:
     * Marines
-        * equipment
         * ammo
         * upgrades
     * Aliens
@@ -44,55 +43,79 @@ function PlayerSpecificsTracker:GetName()
     return "player_specifics"
 end
 
+local function GetMarineUpgrades(player)
+    local upgrades = 0
+
+    if player:GetIsParasited() then
+        upgrades = bit.bor(upgrades, techUpgradesBitmask[kTechId.Parasite])
+    end
+
+    if player:isa("JetpackMarine") then
+        upgrades = bit.bor(upgrades, techUpgradesBitmask[kTechId.Jetpack])
+    end
+
+    --Mapname to TechId list of displayed weapons
+    local displayWeapons = { { Welder.kMapName, kTechId.Welder },
+                             { ClusterGrenadeThrower.kMapName, kTechId.ClusterGrenade },
+                             { PulseGrenadeThrower.kMapName, kTechId.PulseGrenade },
+                             { GasGrenadeThrower.kMapName, kTechId.GasGrenade },
+                             { LayMines.kMapName, kTechId.Mine} }
+
+    for _, weapon in ipairs(displayWeapons) do
+        if player:GetWeapon(weapon[1]) ~= nil then
+            upgrades = bit.bor(upgrades, techUpgradesBitmask[weapon[2]])
+        end
+    end
+
+    return upgrades
+end
+
+function PlayerSpecificsTracker:UpdateMarine(player, id)
+    local upgrades = GetMarineUpgrades(player)
+    local weapon = player:GetActiveWeapon()
+    local ammo = -1
+
+    if weapon and weapon:isa("ClipWeapon") and weapon.GetAmmoFraction then
+        ammo = weapon:GetAmmoFraction()
+    end
+
+    self:TryUpdateValue("upgrades", upgrades, id)
+    self:TryUpdateValue("ammo", ammo, id)
+end
+
+function PlayerSpecificsTracker:UpdateAlien(player, id)
+    local upgrades = 0
+
+    for _, upgrade in ipairs(player:GetUpgrades()) do
+        if techUpgradesBitmask[upgrade] then
+            upgrades = bit.bor(upgrades, techUpgradesBitmask[upgrade])
+        end
+    end
+
+    local lifeform = player:GetPlayerStatusDesc()
+    lifeform = EnumToString(kPlayerStatus, lifeform)
+    local energy
+
+    if player.GetEnergy then
+        energy = player:GetEnergy()
+    else
+        energy = -1
+    end
+
+    self:TryUpdateValue("upgrades", upgrades, id)
+    self:TryUpdateValue("lifeform", lifeform, id)
+    self:TryUpdateValue("energy", energy, id)
+end
+
 function PlayerSpecificsTracker:OnUpdate()
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
         local id = player:GetId()
         player = Shared.GetEntity(player.playerId)
 
         if player:isa("Marine") then
-            local upgrades = 0
-
-            if player:GetIsParasited() then
-                upgrades = bit.bor(upgrades, techUpgradesBitmask[kTechId.Parasite])
-            end
-
-            if player:isa("JetpackMarine") then
-                upgrades = bit.bor(upgrades, techUpgradesBitmask[kTechId.Jetpack])
-            end
-
-            --Mapname to TechId list of displayed weapons
-            local displayWeapons = { { Welder.kMapName, kTechId.Welder },
-                                     { ClusterGrenadeThrower.kMapName, kTechId.ClusterGrenade },
-                                     { PulseGrenadeThrower.kMapName, kTechId.PulseGrenade },
-                                     { GasGrenadeThrower.kMapName, kTechId.GasGrenade },
-                                     { LayMines.kMapName, kTechId.Mine} }
-
-            for _, weapon in ipairs(displayWeapons) do
-                if player:GetWeapon(weapon[1]) ~= nil then
-                    upgrades = bit.bor(upgrades, techUpgradesBitmask[weapon[2]])
-                end
-            end
+            self:UpdateMarine(player, id)
         elseif player:isa("Alien") then
-            local upgrades = 0
-
-            for _, upgrade in ipairs(player:GetUpgrades()) do
-                if techUpgradesBitmask[upgrade] then
-                    upgrades = bit.bor(upgrades, techUpgradesBitmask[upgrade])
-                end
-            end
-
-            local lifeform = ""
-            local energy
-
-            if player.GetEnergy then
-                energy = player:GetEnergy()
-            else
-                energy = -1
-            end
-
-            self:TryUpdateValue("upgrades", upgrades, id)
-            self:TryUpdateValue("lifeform", lifeform, id)
-            self:TryUpdateValue("energy", energy, id)
+            self:UpdateAlien(player, id)
         end
     end
 
