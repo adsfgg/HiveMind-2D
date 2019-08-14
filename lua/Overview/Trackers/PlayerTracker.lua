@@ -31,6 +31,7 @@ function PlayerTracker:OnUpdate()
         local armour = player:GetArmor()
         local team = player:GetTeamNumber()
         local alive = player:GetIsAlive()
+        local commander = player:isa("Commander")
 
         self:TryUpdateValue("player_name", playerName, id)
         self:TryUpdateValue("pres", pres, id)
@@ -38,6 +39,7 @@ function PlayerTracker:OnUpdate()
         self:TryUpdateValue("armour", armour, id)
         self:TryUpdateValue("team", team, id)
         self:TryUpdateValue("alive", alive, id)
+        self:TryUpdateValue("commander", commander, id)
     end
 
     return Tracker.OnUpdate(self)

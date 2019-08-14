@@ -46,10 +46,12 @@ end
 
 function PlayerSpecificsTracker:OnUpdate()
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
+        local id = player:GetId()
+        player = Shared.GetEntity(player.playerId)
         local team = player:GetTeamNumber()
 
         if team == KTeam1Index then
-            print("i'm a marine")
+            local upgrades
         elseif team == kTeam2Index then
             local upgrades = 0
 
@@ -60,7 +62,19 @@ function PlayerSpecificsTracker:OnUpdate()
             end
 
             local lifeform = ""
-            local energy = player:GetEnergy()
+            local energy
+
+            if player.GetEnergy then
+                energy = player:GetEnergy()
+            else
+                energy = -1
+            end
+
+            self:TryUpdateValue("upgrades", upgrades, id)
+            self:TryUpdateValue("lifeform", lifeform, id)
+            self:TryUpdateValue("energy", energy, id)
         end
     end
+
+    return Tracker.OnUpdate(self)
 end
