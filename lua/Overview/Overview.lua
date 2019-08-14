@@ -91,12 +91,36 @@ function Overview:Reset()
     self:InitHeader()
 end
 
+local function BuildModList()
+    local modList = {}
+
+    for i = 1, Server.GetNumMods() do
+        local id   = Server.GetModId(i)
+        local name = Server.GetModTitle(i)
+        modList[i] = { id = id, name = name }
+    end
+
+    return modList
+end
+
+local function BuildServerInfo()
+    local serverInfo = {}
+
+    serverInfo['name'] = Server.GetName()
+    serverInfo['is_dedicated'] = Server.IsDedicated()
+    serverInfo['ip'] = Server.GetIpAddress()
+    serverInfo['mods'] = BuildModList()
+
+    return serverInfo
+end
+
 function Overview:InitHeader()
     header = {}
     header['round_id'] = uuid.new()
     header['map'] = Shared.GetMapName()
     header['start_time'] = os.date("%X")
     header['start_date'] = os.date("%x")
+    header['server_info'] = BuildServerInfo()
 
     -- init these but we need to set their values later in OnGameEnd. We can use these values to check if the data is complete.
     header['winning_team'] = -1
