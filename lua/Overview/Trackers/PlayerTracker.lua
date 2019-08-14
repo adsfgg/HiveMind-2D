@@ -19,7 +19,6 @@ function PlayerTracker:GetName()
     return "player"
 end
 
--- TODO: Add position and accuracy
 function PlayerTracker:OnUpdate()
     -- iterate through all players
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
