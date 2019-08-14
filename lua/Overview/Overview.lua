@@ -3,6 +3,7 @@ if not Server then return end
 Script.Load("lua/Overview/Trackers/GeneralTracker.lua")
 Script.Load("lua/Overview/Trackers/PlayerTracker.lua")
 Script.Load("lua/Overview/Trackers/PlayerSpecificsTracker.lua")
+Script.Load("lua/Overview/Trackers/TeamTracker.lua")
 Script.Load("lua/Overview/GameStateMonitor.lua")
 Script.Load("lua/Overview/SaveSend.lua")
 Script.Load("lua/Overview/uuid.lua")
@@ -69,6 +70,7 @@ function Overview:InitTrackers()
     table.insert(trackers, GeneralTracker())
     table.insert(trackers, PlayerTracker())
     table.insert(trackers, PlayerSpecificsTracker())
+    table.insert(trackers, TeamTracker())
 end
 
 function Overview:Initialize()
