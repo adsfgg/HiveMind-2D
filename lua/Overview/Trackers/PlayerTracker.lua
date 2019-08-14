@@ -8,7 +8,7 @@
     * Health
     * armour
     * position on map
-    * accuracy
+    * direction
 ]]
 
 Script.Load("lua/Overview/Trackers/Tracker.lua")
@@ -36,12 +36,13 @@ function PlayerTracker:OnUpdate()
             local commander = player:isa("Commander")
             local current_weapon = false
             local weapon = player:GetActiveWeapon()
+            local spectator = player:GetIsSpectator()
+            local position = player:GetPositionForMinimap()
+            local direction = player:GetDirectionForMinimap()
 
             if weapon and weapon.GetMapName then
                 current_weapon = weapon:GetMapName()
             end
-
-            local spectator = player:GetIsSpectator()
 
             self:TryUpdateValue("player_name", playerName, id)
             self:TryUpdateValue("pres", pres, id)
@@ -52,6 +53,9 @@ function PlayerTracker:OnUpdate()
             self:TryUpdateValue("commander", commander, id)
             self:TryUpdateValue("spectator", spectator, id)
             self:TryUpdateValue("current_weapon", current_weapon, id)
+            self:TryUpdateValue("position_x", position.x, id)
+            self:TryUpdateValue("position_z", position.z, id)
+            self:TryUpdateValue("direction", direction, id)
         end
     end
 
