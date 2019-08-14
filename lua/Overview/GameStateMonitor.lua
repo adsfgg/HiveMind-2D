@@ -7,12 +7,6 @@ class 'GameStateMonitor'
 local lastState
 
 function GameStateMonitor:CheckGameState()
-    --[[
-    if not Server.IsDedicated() then
-        return false
-    end
-    ]]
-
     local currentState = GetGamerules():GetGameState()
     if not lastState then
         lastState = currentState

@@ -4,6 +4,11 @@ local LibDeflate = GetLibDeflate()
 local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/recieveRoundStats"
 
 local function SendData(compressedJsonData)
+    if not Server.IsDedicated() then
+        print("Overview: Not sending data for local rounds.")
+        return
+    end
+
     Shared.SendHTTPRequest( ns2OverviewStatsURL, "POST", { data = compressedJsonData }, function(response)
         local data, pos, err = json.decode(response)
 
