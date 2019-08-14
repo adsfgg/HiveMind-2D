@@ -53,9 +53,11 @@ function PlayerTracker:OnUpdate()
             self:TryUpdateValue("commander", commander, id)
             self:TryUpdateValue("spectator", spectator, id)
             self:TryUpdateValue("current_weapon", current_weapon, id)
-            self:TryUpdateValue("position_x", position.x, id)
-            self:TryUpdateValue("position_z", position.z, id)
-            self:TryUpdateValue("direction", direction, id)
+            if not spectator then
+                self:TryUpdateValue("position_x", position.x, id)
+                self:TryUpdateValue("position_z", position.z, id)
+                self:TryUpdateValue("direction", direction, id)
+            end
         end
     end
 
