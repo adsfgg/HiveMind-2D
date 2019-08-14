@@ -172,7 +172,7 @@ function Overview:OnCountdownStart()
 end
 
 function Overview:OnGameStart()
-    lastTime = Shared.GetTime() -- force a delayed update.
+    lastTime = 0 -- force an update.
 end
 
 function Overview:OnGameEnd()
