@@ -73,7 +73,7 @@ end
 function PlayerSpecificsTracker:UpdateMarine(player, id)
     local upgrades = GetMarineUpgrades(player)
     local weapon = player:GetActiveWeapon()
-    local ammo = -1
+    local ammo = false
 
     if weapon and weapon:isa("ClipWeapon") and weapon.GetAmmoFraction then
         ammo = weapon:GetAmmoFraction()
@@ -96,10 +96,10 @@ function PlayerSpecificsTracker:UpdateAlien(player, id)
     lifeform = EnumToString(kPlayerStatus, lifeform)
     local energy
 
-    if player.GetEnergy then
-        energy = player:GetEnergy()
+    if player.GetEnergyPercentage then
+        energy = player:GetEnergyPercentage()
     else
-        energy = -1
+        energy = false
     end
 
     self:TryUpdateValue("upgrades", upgrades, id)
