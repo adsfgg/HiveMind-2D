@@ -48,11 +48,31 @@ function PlayerSpecificsTracker:OnUpdate()
     for _, player in ientitylist(Shared.GetEntitiesWithClassname("PlayerInfoEntity")) do
         local id = player:GetId()
         player = Shared.GetEntity(player.playerId)
-        local team = player:GetTeamNumber()
 
-        if team == KTeam1Index then
-            local upgrades
-        elseif team == kTeam2Index then
+        if player:isa("Marine") then
+            local upgrades = 0
+
+            if player:GetIsParasited() then
+                upgrades = bit.bor(upgrades, techUpgradesBitmask[kTechId.Parasite])
+            end
+
+            if player:isa("JetpackMarine") then
+                upgrades = bit.bor(upgrades, techUpgradesBitmask[kTechId.Jetpack])
+            end
+
+            --Mapname to TechId list of displayed weapons
+            local displayWeapons = { { Welder.kMapName, kTechId.Welder },
+                                     { ClusterGrenadeThrower.kMapName, kTechId.ClusterGrenade },
+                                     { PulseGrenadeThrower.kMapName, kTechId.PulseGrenade },
+                                     { GasGrenadeThrower.kMapName, kTechId.GasGrenade },
+                                     { LayMines.kMapName, kTechId.Mine} }
+
+            for _, weapon in ipairs(displayWeapons) do
+                if player:GetWeapon(weapon[1]) ~= nil then
+                    upgrades = bit.bor(upgrades, techUpgradesBitmask[weapon[2]])
+                end
+            end
+        elseif player:isa("Alien") then
             local upgrades = 0
 
             for _, upgrade in ipairs(player:GetUpgrades()) do
