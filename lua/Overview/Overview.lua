@@ -116,6 +116,7 @@ end
 
 function Overview:InitHeader()
     header = {}
+    header['ns2_build_number'] = Shared.GetBuildNumber()
     header['round_id'] = uuid.new()
     header['map'] = Shared.GetMapName()
     header['start_time'] = os.date("%X")

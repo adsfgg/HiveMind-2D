@@ -18,12 +18,18 @@ local function SendData(compressedJsonData)
     end)
 end
 
-local function SaveData(jsonData)
+local function SaveData(jsonData, compressedJsonData)
     local dataFile = io.open("config://RoundStats.json", "w+")
+    local cfile = io.open("config://RoundStatsCompressed.txt", "w+")
 
     if dataFile then
         dataFile:write(jsonData)
         io.close(dataFile)
+    end
+
+    if cfile then
+        cfile:write(compressedJsonData)
+        io.close(cfile)
     end
 end
 
