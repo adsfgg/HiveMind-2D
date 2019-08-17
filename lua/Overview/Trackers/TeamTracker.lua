@@ -39,10 +39,10 @@ end
 
 function TeamTracker:OnUpdate()
     local team = GetGamerules():GetTeam(kTeam1Index)
-    UpdateTeam(self, team, kTeam1Index)
+    UpdateTeam(self, team, "team-" .. kTeam1Index)
 
     team = GetGamerules():GetTeam(kTeam2Index)
-    UpdateTeam(self, team, kTeam2Index)
+    UpdateTeam(self, team, "team-" .. kTeam2Index)
 
     return Tracker.OnUpdate(self)
 end

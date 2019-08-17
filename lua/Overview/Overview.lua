@@ -24,15 +24,26 @@ local update_data = {}
 local total_update_time = 0
 local updates = 0
 
-local function UpdateTrackers()
+local keyframes = 0
+local keyframe_interval = 2 -- seconds
+local last_keyframe_time = 0
+
+local function UpdateTrackers(keyFrame)
     local start_time = Shared.GetTime()
     local trackerData = {}
 
     for _,tracker in ipairs(trackers) do
+        tracker:SetKeyframe(keyFrame)
         local data = tracker:OnUpdate()
         if data then
             trackerData[tracker:GetName()] = data
         end
+    end
+
+    -- we probably need a way to find keyframes easily.
+    if keyFrame then
+        trackerData["keyframe"] = keyframes
+        keyframes = keyframes + 1
     end
 
     if next(trackerData) ~= nil then
@@ -49,12 +60,18 @@ local function UpdateTrackers()
 end
 
 local function OnUpdateServer()
-    if lastTime + delay < Shared.GetTime() then
-        lastTime = Shared.GetTime()
+    local now = Shared.GetTime()
+    local keyFrame = false
 
-        if gameStateMonitor:CheckGameState() then
-            UpdateTrackers()
+    if gameStateMonitor:CheckGameState() and lastTime + delay < now then
+        lastTime = now
+        if last_keyframe_time + keyframe_interval < now then
+            print("KEYFRAME")
+            last_keyframe_time = now
+            keyFrame = true
         end
+
+        UpdateTrackers(keyFrame)
     end
 end
 

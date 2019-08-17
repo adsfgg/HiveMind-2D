@@ -7,6 +7,7 @@ class 'Tracker'
 
 Tracker.fullInfo = {}
 Tracker.changes = {}
+Tracker.keyFrame = false
 
 --https://stackoverflow.com/a/1283608
 local function tableMerge(t1, t2)
@@ -24,6 +25,11 @@ local function tableMerge(t1, t2)
     return t1
 end
 
+function Tracker:SetKeyframe(keyFrame)
+    assert(keyFrame ~= nil and type(keyFrame) == "boolean")
+    self.keyFrame = keyFrame
+end
+
 -- Here we gather info for the tracker
 function Tracker:OnUpdate()
     if next(self.changes) == nil then
@@ -34,6 +40,8 @@ function Tracker:OnUpdate()
 
     local changes = self.changes
     self.changes = {}
+
+    self.keyFrame = false
 
     return changes
 end
@@ -50,6 +58,15 @@ end
 function Tracker:ShouldUpdate(key, value, subarray)
     assert(key)
     assert(value ~= nil)
+
+    if self.keyFrame == true then
+        return true
+    end
+
+    -- don't add empty tables.
+    if type(value) == "table" and next(value) == nil then
+        return false
+    end
 
     if subarray then
         if not self.fullInfo[subarray] then
