@@ -66,7 +66,6 @@ local function OnUpdateServer()
     if gameStateMonitor:CheckGameState() and lastTime + delay < now then
         lastTime = now
         if last_keyframe_time + keyframe_interval < now then
-            print("KEYFRAME")
             last_keyframe_time = now
             keyFrame = true
         end
