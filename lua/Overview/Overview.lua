@@ -25,7 +25,7 @@ local total_update_time = 0
 local updates = 0
 
 local keyframes = 0
-local keyframe_interval = 2 -- seconds
+local keyframe_interval = 10 -- seconds
 local last_keyframe_time = 0
 
 local function UpdateTrackers(keyFrame)
