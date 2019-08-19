@@ -35,7 +35,18 @@ end
 
 function SaveAndSendRoundData(jsonStructure)
     local jsonData = json.encode(jsonStructure, { indent=true })
+    local now = Shared.GetTime()
     local compressedJsonData = LibDeflate:CompressDeflate(json.encode(jsonStructure, { indent=false }))
+    local timeTaken = Shared.GetTime() - now
+
+    print("Compression took: " .. timeTaken .. "ms")
+
+    now = Shared.GetTime()
     SaveData(jsonData, compressedJsonData)
+    timeTaken = Shared.GetTime() - now
+    print("saving regular file took: " .. timeTaken)
+    now = Shared.GetTime()
     SendData(compressedJsonData)
+    timeTaken = Shared.GetTime() - now
+    print("saving compressed file took: " .. timeTaken)
 end
