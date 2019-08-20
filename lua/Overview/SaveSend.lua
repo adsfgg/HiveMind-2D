@@ -9,7 +9,7 @@ local function SendData(jsonData, SendChatMessage)
 
         if err then
             Shared.Message("Could not parse NS2 overview response. Error: " .. ToString(err))
-            status, reason  = -1, "Could not parse NS2 Overview response."
+            status, reason  = 1, "Could not parse NS2 Overview response."
         else
             status = data['status']
             reason = data['reason']
