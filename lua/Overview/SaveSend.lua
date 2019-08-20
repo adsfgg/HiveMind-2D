@@ -30,6 +30,7 @@ local function SendData(jsonData, SendChatMessage)
         else
             -- notify the players that the demo was saved successfully.
             SendChatMessage("Demo recorded.")
+            SendChatMessage("Round ID: " .. data['round-id'])
         end
 
     end)

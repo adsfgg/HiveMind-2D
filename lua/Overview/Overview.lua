@@ -6,11 +6,8 @@ Script.Load("lua/Overview/Trackers/PlayerSpecificsTracker.lua")
 Script.Load("lua/Overview/Trackers/TeamTracker.lua")
 Script.Load("lua/Overview/GameStateMonitor.lua")
 Script.Load("lua/Overview/SaveSend.lua")
-Script.Load("lua/Overview/uuid.lua")
 
 local updatesPerSecond = 10
-
-local uuid = GetUUIDLibrary()
 
 local gameStateMonitor
 local lastTime = 0
@@ -90,7 +87,6 @@ function Overview:InitTrackers()
 end
 
 function Overview:Initialize()
-    uuid.seed()
     gameStateMonitor = GameStateMonitor()
 
     self:InitTrackers()
@@ -109,6 +105,8 @@ function Overview:Reset()
     update_data = {}
     total_update_time = 0
     updates = 0
+    keyframes = 0
+    last_keyframe_time = 0
 
     for _,tracker in ipairs(trackers) do
         tracker:OnReset()
@@ -143,7 +141,6 @@ end
 function Overview:InitHeader()
     header = {}
     header['ns2_build_number'] = Shared.GetBuildNumber()
-    header['round_id'] = uuid.new()
     header['map'] = Shared.GetMapName()
     header['start_time'] = os.date("%X")
     header['start_date'] = os.date("%x")
@@ -202,8 +199,5 @@ function Overview:OnGameEnd()
     jsonStructure['update_data'] = update_data
 
     -- save the data locally then send it to the server.
-    SaveAndSendRoundData(jsonStructure)
-
-    -- notify the players that the demo was saved successfully.
-    SendChatMessage("Demo recorded. Round Id: " .. jsonStructure['header']['round_id'])
+    SaveAndSendRoundData(jsonStructure, SendChatMessage)
 end
