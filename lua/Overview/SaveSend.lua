@@ -1,7 +1,7 @@
 Script.Load("lua/Overview/LibDeflate.lua")
 
 local LibDeflate = GetLibDeflate()
-local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/recieveRoundStats"
+local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/receiveRoundData"
 
 local function SendData(compressedJsonData)
     if not Server.IsDedicated() then
