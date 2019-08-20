@@ -1,7 +1,4 @@
-Script.Load("lua/Overview/LibDeflate.lua")
-
-local LibDeflate = GetLibDeflate()
-local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/receiveRoundData"
+local ns2OverviewStatsURL = "localhost:8000/receiveRoundData"
 
 local function SendData(jsonData, SendChatMessage)
     local status = -128
@@ -11,7 +8,7 @@ local function SendData(jsonData, SendChatMessage)
         local data, pos, err = json.decode(response)
 
         if err then
-            Shared.Message("Could not parse NS2 overview response. Error: " .. ToString(err) .. ". Response: " .. response)
+            Shared.Message("Could not parse NS2 overview response. Error: " .. ToString(err))
             status, reason  = -1, "Could not parse NS2 Overview response."
         else
             status = data['status']
