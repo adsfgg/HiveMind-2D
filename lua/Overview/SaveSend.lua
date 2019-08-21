@@ -1,6 +1,7 @@
 Script.Load("lua/Overview/LibDeflate.lua")
 Script.Load("lua/Overview/base64.lua")
 
+--local ns2OverviewStatsURL = "localhost:8000/receiveRoundData"
 local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/receiveRoundData"
 
 local LibDeflate = GetLibDeflate()
