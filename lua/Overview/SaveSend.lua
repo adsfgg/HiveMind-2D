@@ -1,4 +1,10 @@
-local ns2OverviewStatsURL = "localhost:8000/receiveRoundData"
+Script.Load("lua/Overview/LibDeflate.lua")
+Script.Load("lua/Overview/base64.lua")
+
+local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/receiveRoundData"
+
+local LibDeflate = GetLibDeflate()
+local B64 = GetBase64()
 
 local function SendData(jsonData, SendChatMessage)
     local status = -128
@@ -33,17 +39,32 @@ local function SendData(jsonData, SendChatMessage)
     end)
 end
 
-local function SaveData(jsonData)
+local function SaveData(jsonData, cJsonData, bJsonData)
     local dataFile = io.open("config://RoundStats.json", "w+")
+    local cDataFile = io.open("config://RoundStatsCompressed.bin", "w+")
+    local bDataFile = io.open("config://RoundStatsB64.txt", "w+")
 
     if dataFile then
         dataFile:write(jsonData)
         io.close(dataFile)
     end
+
+    if cDataFile then
+        cDataFile:write(cJsonData)
+        io.close(cDataFile)
+    end
+
+    if bDataFile then
+        bDataFile:write(bJsonData)
+        io.close(bDataFile)
+    end
 end
 
 function SaveAndSendRoundData(jsonStructure, SendChatMessage)
     local jsonData = json.encode(jsonStructure, { indent=true })
-    SaveData(jsonData)
-    SendData(jsonData, SendChatMessage)
+    local cJsonData = LibDeflate:CompressZlib(json.encode(jsonStructure, { index = false }))
+    local bJsonData = B64.encode(cJsonData)
+
+    SaveData(jsonData, cJsonData, bJsonData)
+    SendData(bJsonData, SendChatMessage)
 end
