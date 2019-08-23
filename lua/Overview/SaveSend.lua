@@ -1,8 +1,8 @@
 Script.Load("lua/Overview/LibDeflate.lua")
 Script.Load("lua/Overview/base64.lua")
 
---local ns2OverviewStatsURL = "localhost:8000/receive_round_data"
-local ns2OverviewStatsURL = "https://overview.4sdf.co.uk/receive_round_data"
+--local HiveMindStatsURL = "localhost:8000/receive_round_data"
+local HiveMindStatsURL = "https://overview.4sdf.co.uk/receive_round_data"
 
 local LibDeflate = GetLibDeflate()
 local B64 = GetBase64()
@@ -11,20 +11,15 @@ local function SendData(jsonData, SendChatMessage)
     local status = -128
     local reason = "No response."
 
-    Shared.SendHTTPRequest( ns2OverviewStatsURL, "POST", { data = jsonData }, function(response)
+    Shared.SendHTTPRequest( HiveMindStatsURL, "POST", { data = jsonData }, function(response)
         local data, pos, err = json.decode(response)
 
         if err then
-            Shared.Message("Could not parse NS2 overview response. Error: " .. ToString(err))
-            status, reason  = 1, "Could not parse NS2 Overview response."
+            Shared.Message("Could not parse HiveMind response. Error: " .. ToString(err))
+            status, reason  = 1, "Could not parse HiveMind response."
         else
             status = data['status']
             reason = data['reason']
-
-            if status ~= 0 then
-                Shared.Message("Overview: Status - " .. status)
-                Shared.Message("Overview: Reason - " .. reason)
-            end
         end
 
         if status ~= 0 then

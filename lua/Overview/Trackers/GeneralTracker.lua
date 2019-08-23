@@ -14,7 +14,7 @@ function GeneralTracker:GetName()
 end
 
 function GeneralTracker:OnUpdate()
-    local gameTime = Overview:GetGametime()
+    local gameTime = HiveMind:GetGametime()
 
     self:TryUpdateValue("gameTime", gameTime)
 

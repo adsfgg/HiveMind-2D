@@ -45,16 +45,16 @@ function GameStateMonitor:CheckForGameEnd(currentState)
 end
 
 function GameStateMonitor:OnCountdownStart()
-    print("Overview: Countdown started.")
-    Overview:OnCountdownStart()
+    print("HiveMind: Countdown started.")
+    HiveMind:OnCountdownStart()
 end
 
 function GameStateMonitor:OnGameStart()
-    print("Overview: Game started")
-    Overview:OnGameStart()
+    print("HiveMind: Game started")
+    HiveMind:OnGameStart()
 end
 
 function GameStateMonitor:OnGameEnd()
-    print("Overview: Game ended.")
-    Overview:OnGameEnd()
+    print("HiveMind: Game ended.")
+    HiveMind:OnGameEnd()
 end

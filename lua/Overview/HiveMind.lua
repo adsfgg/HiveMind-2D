@@ -72,21 +72,21 @@ local function OnUpdateServer()
 end
 
 local function SendChatMessage(msg)
-    Server.SendNetworkMessage("Chat", BuildChatMessage(false, "Overview", -1, kTeamReadyRoom, kNeutralTeamType, msg), true)
-    Shared.Message("Chat All - " .. "Overview" .. ": " .. msg)
-    Server.AddChatToHistory(msg, "Overview", 0, kTeamReadyRoom, false)
+    Server.SendNetworkMessage("Chat", BuildChatMessage(false, "HiveMind", -1, kTeamReadyRoom, kNeutralTeamType, msg), true)
+    Shared.Message("Chat All - " .. "HiveMind" .. ": " .. msg)
+    Server.AddChatToHistory(msg, "HiveMind", 0, kTeamReadyRoom, false)
 end
 
-class 'Overview'
+class 'HiveMind'
 
-function Overview:InitTrackers()
+function HiveMind:InitTrackers()
     table.insert(trackers, GeneralTracker())
     table.insert(trackers, PlayerTracker())
     table.insert(trackers, PlayerSpecificsTracker())
     table.insert(trackers, TeamTracker())
 end
 
-function Overview:Initialize()
+function HiveMind:Initialize()
     gameStateMonitor = GameStateMonitor()
 
     self:InitTrackers()
@@ -95,11 +95,11 @@ function Overview:Initialize()
     Event.Hook("UpdateServer", OnUpdateServer)
 end
 
-function Overview:GetGametime()
+function HiveMind:GetGametime()
     return math.max( 0, math.floor(Shared.GetTime()) - GetGameInfoEntity():GetStartTime() )
 end
 
-function Overview:Reset()
+function HiveMind:Reset()
     lastTime = 0
     header = {}
     update_data = {}
@@ -138,7 +138,7 @@ local function BuildServerInfo()
     return serverInfo
 end
 
-function Overview:InitHeader()
+function HiveMind:InitHeader()
     header = {}
     header['ns2_build_number'] = Shared.GetBuildNumber()
     header['map'] = Shared.GetMapName()
@@ -154,7 +154,7 @@ function Overview:InitHeader()
     header['average_update_time'] = -1
 end
 
-function Overview:FinalizeHeaders()
+function HiveMind:FinalizeHeaders()
 
     local winning_team = -1
     local currentState = GetGamerules():GetGameState()
@@ -181,16 +181,16 @@ function Overview:FinalizeHeaders()
     end
 end
 
-function Overview:OnCountdownStart()
+function HiveMind:OnCountdownStart()
     self:Reset()
-    SendChatMessage("Recording overview demo")
+    SendChatMessage("Recording HiveMind demo")
 end
 
-function Overview:OnGameStart()
+function HiveMind:OnGameStart()
     lastTime = 0 -- force an update.
 end
 
-function Overview:OnGameEnd()
+function HiveMind:OnGameEnd()
     self:FinalizeHeaders()
 
     -- initialize the json structure
