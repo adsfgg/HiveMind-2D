@@ -1,11 +1,11 @@
 if not Server then return end
 
-Script.Load("lua/Overview/Trackers/GeneralTracker.lua")
-Script.Load("lua/Overview/Trackers/PlayerTracker.lua")
-Script.Load("lua/Overview/Trackers/PlayerSpecificsTracker.lua")
-Script.Load("lua/Overview/Trackers/TeamTracker.lua")
-Script.Load("lua/Overview/GameStateMonitor.lua")
-Script.Load("lua/Overview/SaveSend.lua")
+Script.Load("lua/HiveMind/Trackers/GeneralTracker.lua")
+Script.Load("lua/HiveMind/Trackers/PlayerTracker.lua")
+Script.Load("lua/HiveMind/Trackers/PlayerSpecificsTracker.lua")
+Script.Load("lua/HiveMind/Trackers/TeamTracker.lua")
+Script.Load("lua/HiveMind/GameStateMonitor.lua")
+Script.Load("lua/HiveMind/SaveSend.lua")
 
 local updatesPerSecond = 10
 

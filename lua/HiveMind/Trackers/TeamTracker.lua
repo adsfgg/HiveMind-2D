@@ -7,7 +7,7 @@
     * tech
 ]]
 
-Script.Load("lua/Overview/Trackers/Tracker.lua")
+Script.Load("lua/HiveMind/Trackers/Tracker.lua")
 
 class 'TeamTracker' (Tracker)
 

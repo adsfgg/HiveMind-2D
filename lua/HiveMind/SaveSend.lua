@@ -1,8 +1,8 @@
-Script.Load("lua/Overview/LibDeflate.lua")
-Script.Load("lua/Overview/base64.lua")
+Script.Load("lua/HiveMind/LibDeflate.lua")
+Script.Load("lua/HiveMind/base64.lua")
 
 --local HiveMindStatsURL = "localhost:8000/receive_round_data"
-local HiveMindStatsURL = "https://overview.4sdf.co.uk/receive_round_data"
+local HiveMindStatsURL = "https://hivemind.4sdf.co.uk/receive_round_data"
 
 local LibDeflate = GetLibDeflate()
 local B64 = GetBase64()

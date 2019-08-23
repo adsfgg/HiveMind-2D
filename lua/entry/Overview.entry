@@ -1,5 +1,5 @@
 modEntry = {
-	Server = "lua/Overview/ModEntry/main.lua",
-	FileHooks = "lua/Overview/ModEntry/filehooks.lua",
+	Server = "lua/HiveMind/ModEntry/main.lua",
+	FileHooks = "lua/HiveMind/ModEntry/filehooks.lua",
 	Priority = 100
 }

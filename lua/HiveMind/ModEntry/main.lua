@@ -1,6 +1,6 @@
 if not Server then return end
 
-Script.Load("lua/Overview/HiveMind.lua")
+Script.Load("lua/HiveMind/HiveMind.lua")
 
 local hm = HiveMind()
 hm:Initialize()
