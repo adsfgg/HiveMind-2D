@@ -144,17 +144,10 @@ function HiveMind:InitHeader()
     header = {}
     header['ns2_build_number'] = Shared.GetBuildNumber()
     header['map'] = Shared.GetMapName()
-    header['start_time'] = os.date("%X")
-    header['start_date'] = os.date("%x")
-    header['timezone'] = os.date("%Z")
     header['server_info'] = BuildServerInfo()
     header['hivemind_version'] = version
 
     -- init these but we need to set their values later in OnGameEnd. We can use these values to check if the data is complete.
-    header['winning_team'] = -1
-    header['round_length'] = -1
-    header['end_time'] = -1
-    header['end_date'] = -1
     header['average_update_time'] = -1
 end
 
@@ -173,8 +166,6 @@ function HiveMind:FinalizeHeaders()
 
     header['winning_team'] = winning_team
     header['round_length'] = self:GetGametime()
-    header['end_time'] = os.date("%X")
-    header['end_date'] = os.date("%x")
     header['update_resolution'] = updatesPerSecond
     header['updates'] = updates
     header['total_update_time'] = total_update_time
