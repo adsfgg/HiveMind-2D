@@ -26,7 +26,7 @@ local keyframe_interval = 10 -- seconds
 local last_keyframe_time = 0
 
 local function UpdateTrackers(keyFrame)
-    local start_time = Shared.GetTime()
+    local start_time = os.clock()
     local trackerData = {}
 
     for _,tracker in ipairs(trackers) do
@@ -48,7 +48,7 @@ local function UpdateTrackers(keyFrame)
         table.insert(update_data, trackerData)
     end
 
-    local end_time = Shared.GetTime()
+    local end_time = os.clock()
     local time_taken = end_time - start_time
 
     total_update_time = total_update_time + math.max(0, time_taken)
@@ -57,7 +57,7 @@ local function UpdateTrackers(keyFrame)
 end
 
 local function OnUpdateServer()
-    local now = Shared.GetTime()
+    local now = os.clock()
     local keyFrame = false
 
     if gameStateMonitor:CheckGameState() and lastTime + delay < now then
