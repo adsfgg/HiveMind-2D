@@ -7,6 +7,8 @@ Script.Load("lua/HiveMind/Trackers/TeamTracker.lua")
 Script.Load("lua/HiveMind/GameStateMonitor.lua")
 Script.Load("lua/HiveMind/SaveSend.lua")
 
+local version = "0.1"
+
 local updatesPerSecond = 10
 
 local gameStateMonitor
@@ -144,7 +146,9 @@ function HiveMind:InitHeader()
     header['map'] = Shared.GetMapName()
     header['start_time'] = os.date("%X")
     header['start_date'] = os.date("%x")
+    header['timezone'] = os.date("%Z")
     header['server_info'] = BuildServerInfo()
+    header['hivemind_version'] = version
 
     -- init these but we need to set their values later in OnGameEnd. We can use these values to check if the data is complete.
     header['winning_team'] = -1
