@@ -73,7 +73,7 @@ local function OnUpdateServer()
     end
 end
 
-local function SendChatMessage(msg)
+function SendHiveMindChatMessage(msg)
     Server.SendNetworkMessage("Chat", BuildChatMessage(false, "HiveMind", -1, kTeamReadyRoom, kNeutralTeamType, msg), true)
     Shared.Message("Chat All - " .. "HiveMind" .. ": " .. msg)
     Server.AddChatToHistory(msg, "HiveMind", 0, kTeamReadyRoom, false)
@@ -178,7 +178,7 @@ end
 
 function HiveMind:OnCountdownStart()
     self:Reset()
-    SendChatMessage("Recording HiveMind demo")
+    SendHiveMindChatMessage("Recording HiveMind demo")
 end
 
 function HiveMind:OnGameStart()
@@ -194,5 +194,5 @@ function HiveMind:OnGameEnd()
     jsonStructure['update_data'] = update_data
 
     -- save the data locally then send it to the server.
-    SaveAndSendRoundData(jsonStructure, SendChatMessage)
+    SaveAndSendRoundData(jsonStructure, SendHiveMindChatMessage)
 end

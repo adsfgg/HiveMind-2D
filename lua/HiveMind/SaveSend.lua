@@ -1,18 +1,19 @@
 Script.Load("lua/HiveMind/LibDeflate.lua")
 Script.Load("lua/HiveMind/base64.lua")
 
---local HiveMindStatsURL = "localhost:8000/receive_round_data"
-local HiveMindStatsURL = "https://hivemind.4sdf.co.uk/receive_round_data"
+local HiveMindStatsURL = "localhost:8000/receive_round_data"
+--local HiveMindStatsURL = "https://hivemind.4sdf.co.uk/receive_round_data"
 
 local LibDeflate = GetLibDeflate()
 local B64 = GetBase64()
 
-local function SendData(jsonData, SendChatMessage)
-    local status = -128
-    local reason = "No response."
+local function HTTPRequestCallback(response, request_error)
+    local status, reason, data, pos, err
 
-    Shared.SendHTTPRequest( HiveMindStatsURL, "POST", { data = jsonData }, function(response)
-        local data, pos, err = json.decode(response)
+    if request_error then
+        status, reason = 128, request_error
+    else
+        data, pos, err = json.decode(response)
 
         if err then
             Shared.Message("Could not parse HiveMind response. Error: " .. ToString(err))
@@ -21,18 +22,21 @@ local function SendData(jsonData, SendChatMessage)
             status = data['status']
             reason = data['reason']
         end
+    end
 
-        if status ~= 0 then
-            SendChatMessage("Demo failed to upload.")
-            SendChatMessage("Status: " .. status)
-            SendChatMessage("Reason: " .. reason)
-        else
-            -- notify the players that the demo was saved successfully.
-            SendChatMessage("Demo recorded.")
-            SendChatMessage("Round ID: " .. data['round_id'])
-        end
+    if status ~= 0 then
+        SendHiveMindChatMessage("Demo failed to upload.")
+        SendHiveMindChatMessage("Status: " .. status)
+        SendHiveMindChatMessage("Reason: " .. reason)
+    else
+        -- notify the players that the demo was saved successfully.
+        SendHiveMindChatMessage("Demo recorded.")
+        SendHiveMindChatMessage("Round ID: " .. data['round_id'])
+    end
+end
 
-    end)
+local function SendData(jsonData)
+    Shared.SendHTTPRequest( HiveMindStatsURL, "POST", { data = jsonData }, HTTPRequestCallback)
 end
 
 local function SaveData(jsonData, cJsonData, bJsonData)
@@ -56,11 +60,11 @@ local function SaveData(jsonData, cJsonData, bJsonData)
     end
 end
 
-function SaveAndSendRoundData(jsonStructure, SendChatMessage)
+function SaveAndSendRoundData(jsonStructure)
     local jsonData = json.encode(jsonStructure, { indent=true })
     local cJsonData = LibDeflate:CompressZlib(json.encode(jsonStructure, { index = false }))
     local bJsonData = B64.encode(cJsonData)
 
     SaveData(jsonData, cJsonData, bJsonData)
-    SendData(bJsonData, SendChatMessage)
+    SendData(bJsonData)
 end
