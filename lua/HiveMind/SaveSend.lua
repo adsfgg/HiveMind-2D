@@ -1,7 +1,7 @@
 Script.Load("lua/HiveMind/LibDeflate.lua")
 Script.Load("lua/HiveMind/base64.lua")
 
-local HiveMindStatsURL = "localhost:8000/receive_round_data"
+local HiveMindStatsURL = "localhost:8000/api/round"
 --local HiveMindStatsURL = "https://hivemind.4sdf.co.uk/receive_round_data"
 
 local LibDeflate = GetLibDeflate()
@@ -31,7 +31,7 @@ local function HTTPRequestCallback(response, request_error)
     else
         -- notify the players that the demo was saved successfully.
         SendHiveMindChatMessage("Demo recorded.")
-        SendHiveMindChatMessage("Round ID: " .. data['round_id'])
+        SendHiveMindChatMessage("Round ID: " .. data['round_uuid'])
     end
 end
 
