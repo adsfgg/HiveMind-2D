@@ -1,2 +1,3 @@
 # HiveMind
-idk
+
+Demo System for NS2
