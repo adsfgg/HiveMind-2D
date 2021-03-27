@@ -9,7 +9,8 @@ Script.Load("lua/HiveMind/SaveSend.lua")
 
 local version = "0.1"
 
-local updatesPerSecond = 10
+local updatesPerSecond = 128
+local maxFramesBetweenKeyframes = updatesPerSecond * 10
 
 local gameStateMonitor
 local lastTime = 0
@@ -24,7 +25,7 @@ local total_update_time = 0
 local updates = 0
 
 local keyframes = 0
-local keyframe_interval = 10 -- seconds
+local keyframe_interval = maxFramesBetweenKeyframes / updatesPerSecond
 local last_keyframe_time = 0
 
 local function UpdateTrackers(keyFrame)
