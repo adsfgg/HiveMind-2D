@@ -6,6 +6,10 @@ class 'GameStateMonitor'
 
 local lastState
 
+function GameStateMonitor:Init(hiveMind)
+    self.hiveMind = assert(hiveMind)
+end
+
 function GameStateMonitor:CheckGameState()
     local currentState = GetGamerules():GetGameState()
     if not lastState then
@@ -45,16 +49,16 @@ function GameStateMonitor:CheckForGameEnd(currentState)
 end
 
 function GameStateMonitor:OnCountdownStart()
-    print("HiveMind: Countdown started.")
-    HiveMind:OnCountdownStart()
+    print("GameStateMonitor:OnCountdownStart()")
+    self.hiveMind:OnCountdownStart()
 end
 
 function GameStateMonitor:OnGameStart()
-    print("HiveMind: Game started")
-    HiveMind:OnGameStart()
+    print("GameStateMonitor:OnGameStart()")
+    self.hiveMind:OnGameStart()
 end
 
 function GameStateMonitor:OnGameEnd()
-    print("HiveMind: Game ended.")
-    HiveMind:OnGameEnd()
+    print("GameStateMonitor:OnGameEnd()")
+    self.hiveMind:OnGameEnd()
 end

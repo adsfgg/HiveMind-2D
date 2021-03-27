@@ -92,6 +92,7 @@ end
 function HiveMind:Initialize()
     Print("HiveMind:Initialize()")
     gameStateMonitor = GameStateMonitor()
+    gameStateMonitor:Init(self)
 
     self:InitTrackers()
 
