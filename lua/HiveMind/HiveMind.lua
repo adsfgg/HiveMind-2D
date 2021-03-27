@@ -82,6 +82,7 @@ end
 class 'HiveMind'
 
 function HiveMind:InitTrackers()
+    Print("HiveMind:InitTrackers()")
     table.insert(trackers, GeneralTracker())
     table.insert(trackers, PlayerTracker())
     table.insert(trackers, PlayerSpecificsTracker())
@@ -89,6 +90,7 @@ function HiveMind:InitTrackers()
 end
 
 function HiveMind:Initialize()
+    Print("HiveMind:Initialize()")
     gameStateMonitor = GameStateMonitor()
 
     self:InitTrackers()
@@ -102,6 +104,7 @@ function HiveMind:GetGametime()
 end
 
 function HiveMind:Reset()
+    Print("HiveMind:Reset()")
     lastTime = 0
     header = {}
     update_data = {}
@@ -141,6 +144,7 @@ local function BuildServerInfo()
 end
 
 function HiveMind:InitHeader()
+    Print("HiveMind:InitHeader()")
     header = {}
     header['ns2_build_number'] = Shared.GetBuildNumber()
     header['map'] = Shared.GetMapName()
@@ -152,7 +156,7 @@ function HiveMind:InitHeader()
 end
 
 function HiveMind:FinalizeHeaders()
-
+    Print("HiveMind:FinalizeHeaders()")
     local winning_team = -1
     local currentState = GetGamerules():GetGameState()
 
@@ -177,15 +181,18 @@ function HiveMind:FinalizeHeaders()
 end
 
 function HiveMind:OnCountdownStart()
+    Print("HiveMind:OnCountdownStart()")
     self:Reset()
     SendHiveMindChatMessage("Recording HiveMind demo")
 end
 
 function HiveMind:OnGameStart()
+    Print("HiveMind:OnGameStart()")
     lastTime = 0 -- force an update.
 end
 
 function HiveMind:OnGameEnd()
+    Print("HiveMind:OnGameEnd()")
     self:FinalizeHeaders()
 
     -- initialize the json structure
