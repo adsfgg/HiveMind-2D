@@ -73,14 +73,17 @@ end
 function PlayerSpecificsTracker:UpdateMarine(player, id)
     local upgrades = GetMarineUpgrades(player)
     local weapon = player:GetActiveWeapon()
-    local ammo = false
+    local clip = false
+    local clipSize = false
 
-    if weapon and weapon:isa("ClipWeapon") and weapon.GetAmmoFraction then
-        ammo = weapon:GetAmmoFraction()
+    if weapon and weapon:isa("ClipWeapon") then
+        clip = weapon:GetClip()
+        clipSize = weapon:GetClipSize()
     end
 
     self:TryUpdateValue("upgrades", upgrades, id)
-    self:TryUpdateValue("ammo", ammo, id)
+    self:TryUpdateValue("clip", clip, id)
+    self:TryUpdateValue("clipSize", clipSize, id)
 end
 
 function PlayerSpecificsTracker:UpdateAlien(player, id)
