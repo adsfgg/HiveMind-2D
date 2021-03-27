@@ -1,11 +1,12 @@
 Script.Load("lua/HiveMind/LibDeflate.lua")
 Script.Load("lua/HiveMind/base64.lua")
 
-local HiveMindStatsURL = "localhost:8000/api/round"
---local HiveMindStatsURL = "https://hivemind.4sdf.co.uk/receive_round_data"
+local HiveMindStatsURL = "https://hivemind.4sdf.co.uk/receive_round_data"
+local HiveMindStatsURLDebug = "127.0.1.1:8000/receive_round_data"
 
 local LibDeflate = GetLibDeflate()
 local B64 = GetBase64()
+local HiveMindFilePath = "config://hivemind/RoundData.%s"
 
 local function HTTPRequestCallback(response, request_error)
     local status, reason, data, pos, err
@@ -31,40 +32,52 @@ local function HTTPRequestCallback(response, request_error)
     else
         -- notify the players that the demo was saved successfully.
         SendHiveMindChatMessage("Demo recorded.")
-        SendHiveMindChatMessage("Round ID: " .. data['round_uuid'])
+        SendHiveMindChatMessage("Round ID: " .. data['round_id'])
     end
 end
 
-local function SendData(jsonData)
-    Shared.SendHTTPRequest( HiveMindStatsURL, "POST", { data = jsonData }, HTTPRequestCallback)
+local function SendData(jsonData, debug)
+    local url = debug and HiveMindStatsURLDebug or HiveMindStatsURL
+    Shared.SendHTTPRequest(url, "POST", { data = jsonData }, HTTPRequestCallback)
 end
 
-local function SaveData(jsonData, cJsonData, bJsonData)
-    local dataFile = io.open("config://RoundStats.json", "w+")
-    local cDataFile = io.open("config://RoundStatsCompressed.bin", "w+")
-    local bDataFile = io.open("config://RoundStatsB64.txt", "w+")
-
-    if dataFile then
-        dataFile:write(jsonData)
-        io.close(dataFile)
-    end
-
-    if cDataFile then
-        cDataFile:write(cJsonData)
-        io.close(cDataFile)
-    end
-
-    if bDataFile then
-        bDataFile:write(bJsonData)
-        io.close(bDataFile)
-    end
+local function CreateFilePath(ext)
+    return string.format(HiveMindFilePath, ext)
 end
 
-function SaveAndSendRoundData(jsonStructure)
+local function SaveData(bJsonData)
+    local demoFile = assert(io.open(CreateFilePath(uuid, "demo"), "w+"))
+    dataFile:write(base64stream)
+    io.close(dataFile)
+end
+
+local function SaveDataDebug(jsonData, cJsonData, bJsonData)
+    local dataFile = assert(io.open(CreateFilePath("json"), "w+"))
+    local cDataFile = assert(io.open(CreateFilePath("bin"), "w+"))
+    local bDataFile = assert(io.open(CreateFilePath("b64"), "w+"))
+
+    dataFile:write(jsonData)
+    cDataFile:write(cJsonData)
+    bDataFile:write(bJsonData)
+
+    io.close(dataFile)
+    io.close(cDataFile)
+    io.close(bDataFile)
+end
+
+function SaveAndSendRoundData(jsonStructure, debug)
+    -- First we encode our table as JSON
     local jsonData = json.encode(jsonStructure, { indent=true })
+    -- Then we compress using Deflate
     local cJsonData = LibDeflate:CompressZlib(json.encode(jsonStructure, { index = false }))
+    -- Then we encode using B64, this will increase the file size slightly but will make it transmittable via post headers
     local bJsonData = B64.encode(cJsonData)
 
-    SaveData(jsonData, cJsonData, bJsonData)
-    SendData(bJsonData)
+    if debug then
+        SaveDataDebug(jsonData, cJsonData, bJsonData)
+    else
+        SaveData(bJsonData)
+    end
+
+    SendData(bJsonData, debug)
 end

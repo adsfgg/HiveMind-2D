@@ -10,7 +10,7 @@ Script.Load("lua/HiveMind/SaveSend.lua")
 local version = "0.1"
 
 local updatesPerSecond = 128
-local maxFramesBetweenKeyframes = updatesPerSecond * 10
+local maxFramesBetweenKeyframes = 5000
 
 local gameStateMonitor
 local lastTime = 0
@@ -182,6 +182,10 @@ function HiveMind:FinalizeHeaders()
     end
 end
 
+function HiveMind:GetDebug()
+    return true
+end
+
 function HiveMind:OnCountdownStart()
     Print("HiveMind:OnCountdownStart()")
     self:Reset()
@@ -203,5 +207,5 @@ function HiveMind:OnGameEnd()
     jsonStructure['update_data'] = update_data
 
     -- save the data locally then send it to the server.
-    SaveAndSendRoundData(jsonStructure, SendHiveMindChatMessage)
+    SaveAndSendRoundData(jsonStructure, self:GetDebug())
 end
